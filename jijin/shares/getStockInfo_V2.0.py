@@ -2,7 +2,6 @@
 
 import requests
 from bs4 import BeautifulSoup
-import traceback
 import re
 import time
 import sys
