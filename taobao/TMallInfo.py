@@ -37,6 +37,7 @@ class TM_producs(object):
         url = self.url + endurl.format(num)
         html = requests.get(url,headers=self.headers).text
         infos = re.findall('\(({.*})\)',html)[0]
+        print(infos)
         infos = json.loads(infos)
         # totalpage = infos.get('total_page')
         totalpage = 1
@@ -66,6 +67,6 @@ class TM_producs(object):
             time.sleep(1+random.random())
 
 if __name__ == '__main__':
-    storename = 'uniqlo'
+    storename = '电梯'
     tm = TM_producs(storename)
     tm.main()
