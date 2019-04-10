@@ -17,9 +17,6 @@ password=input("password: ")    #从键盘输入密码，但这样不安全
 
 
 
-
-
-
 #登录页面
 brower=webdriver.PhantomJS(executable_path="D:/Anaconda3/phantomjs-2.1.1-windows/bin/phantomjs.exe")
 brower.get("https://login.taobao.com")
