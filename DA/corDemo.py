@@ -2,15 +2,27 @@ import pandas as pd
 import pylab as plt
 import numpy as np
 
+import cx_Oracle as cxo
+
 '''
     计算相关性
 '''
 
-A = [28, 1, 61, 2, 50, 55, 33, 36, 95, 12, 54, 57, 57, 97, 70, 70, 55, 52, 89, 25]
-B = [48, 39, 38, 16, 99, 48, 36, 59, 33, 91, 9, 50, 74, 74, 72, 16, 26, 20, 69, 42]
+dsn_tnsstr = cxo.makedsn('localhost', '1521', 'ORCLPDB')
+dsn_tns = dsn_tnsstr.replace('SID', 'SERVICE_NAME')
+conn = cxo.connect("test", "123456", dsn_tns)
+curs = conn.cursor()
 
-a = pd.Series(A)
-b = pd.Series(B)
+rs = curs.execute("select substr(TEMPERATURE, 0, length(TEMPERATURE)-1), substr(HUMIDITY, 0, length(HUMIDITY)-1), substr(WINP, 0, length(WINP)-1), TEMP from w_weather")
+result = rs.fetchall()
 
-print(a.corr(b))
-print(b.corr(a))
+df = pd.DataFrame(list(result))
+print(df.shape)
+print(df.head())
+
+print(df.corr())              # pearson相关系数
+print(df.corr("kendall"))    # kendall Tau相关系数
+print(df.corr('spearman'))   # spearman秩相关
+
+# for res in result:
+#     print(res[0][0:len(str(res[0]))-1], res[1][0:len(str(res[1]))-1], res[2][0:len(str(res[2]))-1], res[3])
