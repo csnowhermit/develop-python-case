@@ -28,7 +28,22 @@ def createmap():
     print("最短距离：", dis)
     print("最短路径：", road)
 
+'''
+    dict 根据值找键
+'''
+def get_key(dict, value):
+    k = [k for k,v in dict.items() if v == value]
+    return k
+
 def map():
+    dict = {}
+    dict["入口"] = 0
+    dict["丘陵"] = 1
+    dict["沼泽"] = 2
+    dict["河流"] = 3
+    dict["草地"] = 4
+    dict["出口"] = 5
+
     # 入口，丘陵，沼泽，河流，草地，出口
     map = [[_, 6, 3, _, _, _],
            [6, _, 2, 5, _, _],
@@ -37,10 +52,16 @@ def map():
            [_, _, 4, 2, _, 5],
            [_, _, _, 3, 5, _]]
 
-    s, e = input("输入起点和终点：").split()
-    dis, road = Dijkstra(5, 8, map, int(s), int(e))
+    start, end = input("输入起点和终点：").split()
+    print(dict[start], dict[end])
+    dis, road = Dijkstra(5, 8, map, int(dict[start]), int(dict[end]))
     print("最短距离：", dis)
-    print("最长距离：", road)
+    print("最短路径：", road)
+    print("Details：")
+    for r in road:
+        print(get_key(dict, r))
+
+
 
 
 '''
