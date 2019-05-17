@@ -4,7 +4,7 @@
     需求：从入口到出口，最短路径
 '''
 
-#定义不可达距离
+#定义不可达距离，float('inf')表示正无穷，float('-inf')表示负无穷
 _ = float('inf')
 
 '''
@@ -52,17 +52,18 @@ def map():
            [_, _, 4, 2, _, 5],
            [_, _, _, 3, 5, _]]
 
-    start, end = input("输入起点和终点：").split()
+    # start, end = input("输入起点和终点：").split()
+    start, end = "入口", "出口"
     print(dict[start], dict[end])
     dis, road = Dijkstra(5, 8, map, int(dict[start]), int(dict[end]))
     print("最短距离：", dis)
     print("最短路径：", road)
+
+    roads_cn = []
     print("Details：")
     for r in road:
-        print(get_key(dict, r))
-
-
-
+        roads_cn.append(get_key(dict, r)[0])
+    print(roads_cn)
 
 '''
     Dijkstra算法：求最短路径
@@ -95,11 +96,14 @@ def Dijkstra(points, edges, graph, start, end):
             pre[i] = start
         else:
             pre[i] = -1
+    print(dis)
+    print(pre)
 
     vis[start] = 1
     for i in range(points + 1):    # 每循环一次确定一条最短路径
         min = _
         for j in range(points + 1):    # 寻找当前最短路
+            print("i：", i, ", j：", j, " == ", dis[j], " ,min: ", min)
             if vis[j] == 0 and dis[j] < min:
                 t = j
                 min = dis[j]
