@@ -103,15 +103,17 @@ def Dijkstra(points, edges, graph, start, end):
     for i in range(points + 1):    # 每循环一次确定一条最短路径
         min = _
         for j in range(points + 1):    # 寻找当前最短路
-            print("i：", i, ", j：", j, " == ", dis[j], " ,min: ", min)
+            # print("i：", i, ", j：", j, " == ", dis[j], " ,min: ", min)
             if vis[j] == 0 and dis[j] < min:
                 t = j
                 min = dis[j]
         vis[t] = 1    # 找到最短的一条路径，标记
+        print(i, " 第一次循环后：", dis, " t值：", t)
         for j in range(points + 1):
             if vis[j] == 0 and dis[j] > dis[t] + map[t][j]:
                 dis[j] = dis[t] + map[t][j]
                 pre[j] = t
+        print(i, " 第二次循环后：", dis, " t值：", t)
     p = end
     len = 0
     while p >= 1 and len < points:

@@ -120,20 +120,20 @@ text = "操劳一天了，晚上来个腰子补补"
 
 # tf-idf分词
 list = analyse.extract_tags(text, 20, withWeight=True)    # 分词，根据TF-IDF找出前20个关键字
-print(list)
+print("TF*IDF后：", list)
 for s in list:
     print(s[0], s[1])
 
 # textrank分词
 list1 = analyse.textrank(text, 20, withWeight=True)    # 分词，根据textrank# 找出前20个关键字
-print(list1)
+print("TextRank后：", list1)
 
 words = jieba.cut(text)
 
 liststr = "/ ".join(words)
-print(liststr)
+print("jieba分词后：", liststr)
 
 words = posseg.cut(text)
 # print(words)
 for w in words:
-    print(w.word, w.flag)
+    print(w.word, w.flag)    # 打印词语和词性

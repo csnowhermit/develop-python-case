@@ -57,7 +57,7 @@ def Dijkstra(map, start, end):
     pre = [_ for i in range(points)]      # 相应位置表示每一个节点的前一个节点
     vis = [0 for i in range(points)]      # 记录节点遍历状态：0表示未遍历，1表示已遍历
     road = [0 for i in range(points)]     # 保存最短距离
-    dis = [_ for i in range(points)]      # 从start点到所有点的长度
+    dis = [_ for i in range(points)]      # 从start点到所有点的长度，最短路径
 
     # 整理从start点到所有点的长度
     for i in range(points):
@@ -76,16 +76,20 @@ def Dijkstra(map, start, end):
     vis[start] = 1    # 从start节点开始遍历
     for i in range(points):
         min = _    # 最短路径
+        # 第一次for循环，找当前节点往下一步最短路径
         for j in range(points):
             # print("i：", i, ", j：", j, get_key(i), "-->", get_key(j), " 的距离为：", dis[j], min)
             if vis[j] == 0 and dis[j] < min:    # 如果当前节点没走过，且从起始点到当前点的距离小于min
                 t = j         # 记录下当前的节点索引
                 min = dis[j]
         vis[t] = 1    # 表示最短路径的节点被遍历过
+        print(i, " 第一次循环后：", dis, " t值：", t)
+        # 第二次for循环，比较当前dist与最短路径+去下一步的距离，再次获得最短路径
         for j in range(points):
             if vis[j] == 0 and dis[j] > dis[t] + map[t, j]:
                 dis[j] = dis[t] + map[t, j]
                 pre[j] = t
+        print(i, " 第二次循环后：", dis, " t值：", t)
     print("调整后：")
     print(dis)
     print(pre)
