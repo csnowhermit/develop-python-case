@@ -78,7 +78,7 @@ def Dijkstra(points, edges, graph, start, end):
     map = [[_ for i in range(points + 1)] for j in range(points + 1)]
     pre = [0] * (points + 1)    # 记录先驱
     vis = [0] * (points + 1)    # 记录节点遍历状态
-    dis = [_ for i in range(points + 1)]    # 保存最短距离
+    dis = [_ for i in range(points + 1)]    # 保存最短距离，从start到我的最短距离，每次循环都需要更新这个最短距离
     road = [0] * (points + 1)   # 保存最短路径
     roads = []
 
