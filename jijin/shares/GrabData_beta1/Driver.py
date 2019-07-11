@@ -2,7 +2,8 @@
 # encoding=utf-8
 
 import threading
-from shares.GrabData_beta1.GrabStockInfo import *
+from jijin.shares.GrabData_beta1.GrabStockInfo import *
+from jijin.shares.GrabData_beta1.Logger import *
 
 '''
     从东方财富网获取股票链接，在百度股票中获取每只股票具体的数值

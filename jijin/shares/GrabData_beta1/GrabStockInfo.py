@@ -5,7 +5,7 @@ import requests
 from bs4 import BeautifulSoup
 import re
 import traceback
-from shares.GrabData_beta1.Logger import *
+from jijin.shares.GrabData_beta1.Logger import *
 
 '''
     爬取股票信息工具类

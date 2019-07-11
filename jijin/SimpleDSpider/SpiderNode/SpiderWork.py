@@ -3,9 +3,9 @@
 
 from multiprocessing.managers import BaseManager
 
-from SimpleDSpider.SpiderNode.HtmlParser import HtmlParser
+from jijin.SimpleDSpider.SpiderNode.HtmlParser import *
 
-from SimpleDSpider.SpiderNode.HtmlDownloader import HtmlDownloader
+from jijin.SimpleDSpider.SpiderNode.HtmlDownloader import *
 
 '''
     爬虫调度器
