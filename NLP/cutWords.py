@@ -23,13 +23,16 @@ with open("./data/stop_words.txt", encoding="UTF-8") as fo:
     for line in fo.readlines():
         stop_words.append(line.strip('\n'))
 
-
 def cut():
     count_freq = {}
     for line in contents:
         words = jieba.cut(str(line), cut_all=True)    # 全模式切分
         words = list(words)
-        print("/ ".join(words))
+        # print("/ ".join(words))
+        for w in range(len(words)):
+            pass
+
+
 
     # for i in range(len(words)):
     #     try:
