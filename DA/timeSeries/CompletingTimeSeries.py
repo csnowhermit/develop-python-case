@@ -38,7 +38,7 @@ def controller():
         now += delta
 
 '''
-    获取站线信息：要确保某线某站是否的启用时间
+    获取站线信息：要确保某线某站已启用
 '''
 def getStationAndLine():
     sql = "select distinct station_name, line_name from passenger_flow order by line_name, station_name"
