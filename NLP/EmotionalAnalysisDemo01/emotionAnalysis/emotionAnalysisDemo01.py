@@ -3,6 +3,7 @@ import jieba
 
 '''
     基于词典的社交媒体内容的情感分析
+    https://blog.csdn.net/xyisv/article/details/79440711
 '''
 
 emotion_dic = {}
@@ -46,7 +47,9 @@ def get_emotion(score):
 
 
 # test = "才拒绝做爱情代罪的羔羊"
-test = "安检速度太慢！早上过安检非常浪费时间！"
+test = "" """
+    这个问题我提过好多次了，六号线地铁里空调能否开足一点？密闭的空间，人多体味又重，地铁公司方面应该要考虑到这个问题。    
+"""
 
 seg_list = jieba.cut(test, cut_all=True)
 string = "/ ".join(seg_list)
