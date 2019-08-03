@@ -18,3 +18,4 @@ derby.log
 *.iml
 nb-configuration.xml
 .DS_Store
+weibo_public_sentiment/crawler/__pycache__/
