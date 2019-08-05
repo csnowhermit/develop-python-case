@@ -67,4 +67,5 @@ if __name__ == '__main__':
     url = 'http://www.weather.com.cn/weather/101280101.shtml'   # 获取天气数据的网址
     html = htmlcontent(url)    # 获取网页信息
     result = weatherdata(html)    # 解析网页信息，拿到需要的数据
-    writedata(result, 'd:/天气test.csv')  # 数据写入到 csv文档中
+    print(result)
+    # writedata(result, 'd:/天气test.csv')  # 数据写入到 csv文档中
