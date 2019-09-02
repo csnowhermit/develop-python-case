@@ -1,9 +1,1 @@
-我的Python程序实例。
-including：
-BlockChain(区块链)
-commonUtils(实用小工具)
-DA(数据分析、统计学实例)
-front-end(通信前置模型，简易通信前置实例)
-jijin(爬虫系统，爬取基金股票数据存储在本地做分析)
-wechat(微信收发消息操作实例)
-xml(XML报文动态加验签)
+my python case

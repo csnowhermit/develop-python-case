@@ -50,7 +50,7 @@ class smtpNotify():
 
 
 if __name__ == '__main__':
-    to_list = ['920164255@qq.com', '492259023@qq.com']
+    to_list = ['***@qq.com', '***@qq.com']
     server_host = 'smtp.agree.com.cn'
     username = '********@agree.com.cn'
     password = ''
