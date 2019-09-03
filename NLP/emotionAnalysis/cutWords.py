@@ -10,16 +10,16 @@ from collections import Counter
     舆情数据：中文分词
 '''
 
-jieba.load_userdict("./data/hmm.txt")  # 过滤掉不拆分的词
+jieba.load_userdict("../data/hmm.txt")  # 过滤掉不拆分的词
 contents = []
-with open("./data/2018.6-2019.5舆情数据.txt", encoding='UTF-8') as f:
+with open("../data/2018.6-2019.5舆情数据.txt", encoding='UTF-8') as f:
     line = f.readline()
     while line:
         contents.append(line)
         line = f.readline()
 
 stop_words = []  # 停用词
-with open("./data/stop_words.txt", encoding="UTF-8") as fo:
+with open("../data/stop_words.txt", encoding="UTF-8") as fo:
     for line in fo.readlines():
         stop_words.append(line.strip('\n'))
 
@@ -31,8 +31,6 @@ def cut():
         # print("/ ".join(words))
         for w in range(len(words)):
             pass
-
-
 
     # for i in range(len(words)):
     #     try:
