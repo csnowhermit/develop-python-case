@@ -58,15 +58,15 @@ text = '北京天气：晴，20～33摄氏度，西北风3-4级'
 
 engine.say(text)    # 正常语速
 
-print(engine.getProperty("rate"))
-engine.setProperty('rate', engine.getProperty("rate") - 60)    # 改变语速
-# engine.setProperty('age', 18)    # 18岁
-# engine.setProperty('gender', 'female')    #
-engine.say(text)
+# print(engine.getProperty("rate"))
+# engine.setProperty('rate', engine.getProperty("rate") - 60)    # 改变语速
+# # engine.setProperty('age', 18)    # 18岁
+# # engine.setProperty('gender', 'female')    #
+# engine.say(text)
 
-print(engine.getProperty('volume'))
-engine.setProperty('volume', engine.getProperty('volume') - 0.5)    # 音量
-engine.say(text)
+# print(engine.getProperty('volume'))
+# engine.setProperty('volume', engine.getProperty('volume') - 0.5)    # 音量
+# engine.say(text)
 
 
 engine.runAndWait()
