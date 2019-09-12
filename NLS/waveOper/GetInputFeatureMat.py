@@ -15,8 +15,8 @@ from scipy.fftpack import fft
 
 # filename = "D:/workspace/IDEA_Projects/nls/ali/example-recognizer/target/classes/nls-sample-16k.wav"
 # filename = "./nls-sample-16k.wav"
-filename = "D:/coco/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_0.wav"
-filename = "D:/coco/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_1.wav"
+filename = "D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_0.wav"
+filename = "D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_1.wav"
 
 wav = wave.open(filename, "rb")  # 打开一个wav格式的声音文件流
 num_frame = wav.getnframes()  # 获取帧数
