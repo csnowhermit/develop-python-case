@@ -10,7 +10,7 @@ from scipy.fftpack import fft
     4.定义汉明窗：用周期函数；对每份数据加窗：数据array×汉明窗数据；
     5.每个窗进行快速傅立叶变换；
     6.每个窗取前一半的数据即可（因为是对称的）；
-    7.data_input.reshape(data_input.shape[0],data_input.shape[1],1)，之后为特征向量；
+    7.data_input.reshape(data_input.shape[0],data_input.shape[1],1)，得到特征向量；
 '''
 
 # filename = "D:/workspace/IDEA_Projects/nls/ali/example-recognizer/target/classes/nls-sample-16k.wav"
