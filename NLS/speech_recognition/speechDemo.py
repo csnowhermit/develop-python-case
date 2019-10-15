@@ -7,7 +7,7 @@ import speech
 while True:
     say = speech.input()  # 接收语音
     speech.say("you said:" + say)  # 说话
-    print(say)
+    print(type(say), say)
 
     if say == "你好":
         speech.say("How are you?")
