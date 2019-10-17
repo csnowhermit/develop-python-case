@@ -1,4 +1,8 @@
 
+'''
+    拼音转汉字
+'''
+
 def pinyin_2_hanzi(pinyinList):
     from Pinyin2Hanzi import DefaultDagParams
     from Pinyin2Hanzi import dag
