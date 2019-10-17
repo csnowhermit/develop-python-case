@@ -26,6 +26,8 @@
     科大讯飞语音听写：流式版，webAPI
 '''
 
+import os
+import random
 import websocket
 import datetime
 import hashlib
@@ -44,6 +46,7 @@ STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
+file = open("D:/reco_result.txt", 'w', encoding="utf-8")
 
 class Ws_Param(object):
     # 初始化
@@ -100,6 +103,8 @@ def on_message(ws, message):
         if code != 0:
             errMsg = json.loads(message)["message"]
             print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
+            file.write("sid:%s call error:%s code is:%s \n" % (sid, errMsg, code))
+            file.flush()
 
         else:
             data = json.loads(message)["data"]["result"]["ws"]
@@ -109,8 +114,12 @@ def on_message(ws, message):
                 for w in i["cw"]:
                     result += w["w"]
             print("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
+            file.write("sid:%s call success!,data is:%s \n" % (sid, json.dumps(data, ensure_ascii=False)))
+            file.flush()
     except Exception as e:
         print("receive msg,but parse exception:", e)
+        file.write("receive msg,but parse exception:%s \n" % (e))
+        file.flush()
 
 
 
@@ -175,15 +184,33 @@ if __name__ == "__main__":
     # 测试时候在此处正确填写相关信息即可运行
     # 文件：D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_124.wav
     # WAV内容：另外，女单中国队，还有韩西娜和姚彦，奥运排名第67位，也可以高手一搏。
-    time1 = datetime.now()
-    wsParam = Ws_Param(APPID='5d760a37',
-                       APIKey='0881cf5a9cb3548c79e654b26f77b572',
-                       APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                       AudioFile=r'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_124.wav')
-    websocket.enableTrace(False)
-    wsUrl = wsParam.create_url()
-    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-    time2 = datetime.now()
-    print(time2-time1)
+
+    dir_paths = ['D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/',
+                 'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/ST-CMDS-20170001_1-OS/']
+
+    for dpath in dir_paths:
+        for filename in os.listdir(dpath):
+            if filename.endswith(".wav"):
+                fullPath = dpath + filename
+                print(fullPath)
+                file.write(fullPath + "\n")
+                file.flush()
+
+                time1 = datetime.now()
+                wsParam = Ws_Param(APPID='5d760a37',
+                                   APIKey='0881cf5a9cb3548c79e654b26f77b572',
+                                   APISecret='c340e2627a9c1697c117769dbdbb12d5',
+                                   AudioFile=fullPath)
+                websocket.enableTrace(False)
+                wsUrl = wsParam.create_url()
+                ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+                ws.on_open = on_open
+                ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+                time2 = datetime.now()
+                print(time2 - time1)
+
+                time.sleep(random.randint(2, 10))
+
+
+
+
