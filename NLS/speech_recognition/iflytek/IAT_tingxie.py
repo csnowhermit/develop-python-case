@@ -46,7 +46,7 @@ STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
-file = open("D:/reco_result.txt", 'w', encoding="utf-8")
+file = open("D:/data/iat_tingxie/reco_result.txt", 'w', encoding="utf-8")
 
 class Ws_Param(object):
     # 初始化
@@ -185,7 +185,9 @@ if __name__ == "__main__":
     # 文件：D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_124.wav
     # WAV内容：另外，女单中国队，还有韩西娜和姚彦，奥运排名第67位，也可以高手一搏。
 
-    dir_paths = ['D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/',
+    dir_paths = ['D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/train/',
+                 'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/test/',
+                 'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/dev/',
                  'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/ST-CMDS-20170001_1-OS/']
 
     for dpath in dir_paths:

@@ -16,3 +16,5 @@ def pinyin_2_hanzi(pinyinList):
 if __name__ == '__main__':
     lists1 = ['dong', 'bei', 'jun', 'de', 'yi', 'xie', 'ai', 'guo', 'jiang', 'shi', 'ye', 'fen', 'qi', 'kang', 'zhan']
     pinyin_2_hanzi(lists1)
+    # list2 = ['er', 'mao', 'ni', 'jin', 'tian', 'mei', 'ke', 'ma', 'hai', 'he', 'li', 'xia', 'liao', 'tian']
+    # pinyin_2_hanzi(list2)

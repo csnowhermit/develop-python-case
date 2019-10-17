@@ -6,7 +6,7 @@ import json
 
 dict = {}
 
-with open("d:/reco_result.txt", 'r', encoding='utf-8') as fo:
+with open("d:/data/iat_tingxie/reco_result.txt", 'r', encoding='utf-8') as fo:
     filename = ""
     content = ["begin"]
     for line in fo.readlines():
@@ -18,7 +18,7 @@ with open("d:/reco_result.txt", 'r', encoding='utf-8') as fo:
             content.append(line)
             dict[filename] = content
 
-with open("D:/reco_text.txt", 'w', encoding="utf-8") as fw:
+with open("D:/data/iat_tingxie/reco_text.txt", 'w', encoding="utf-8") as fw:
     for k in dict.keys():
         # print(k, type(dict[k]), dict[k])
         filename = k
