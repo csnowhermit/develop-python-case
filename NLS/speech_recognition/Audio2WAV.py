@@ -7,17 +7,17 @@ import wave
     Python调用麦克风生成WAV文件
 '''
 
-input_filename = "input.wav"               # 麦克风采集的语音输入
-input_filepath = "音频存储位置"              # 输入文件的path
+input_filename = "input.wav"                           # 麦克风采集的语音输入
+input_filepath = "D:/data/iat_tingxie/"              # 输入文件的path
 in_path = input_filepath + input_filename
 
 def get_audio(filepath):
-    aa = str(input("是否开始录音？   （是/否）"))
-    if aa == str("是") :
+    aa = str(input("是否开始录音？   （y/N）"))
+    if aa == str("y") :
         CHUNK = 256
         FORMAT = pyaudio.paInt16
         CHANNELS = 1                # 声道数
-        RATE = 16000                # 样率采
+        RATE = 16000                # 采样率
         RECORD_SECONDS = 10
         WAVE_OUTPUT_FILENAME = filepath
         p = pyaudio.PyAudio()
@@ -45,7 +45,7 @@ def get_audio(filepath):
         wf.setframerate(RATE)
         wf.writeframes(b''.join(frames))
         wf.close()
-    elif aa == str("否"):
+    elif aa == str("N"):
         exit()
     else:
         print("无效输入，请重新选择")

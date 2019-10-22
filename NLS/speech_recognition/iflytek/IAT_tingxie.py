@@ -237,3 +237,4 @@ if __name__ == "__main__":
                     else:
                         continue
                     time.sleep(random.randint(2, 10))
+                    os.rename(fullPath, fullPath + ".old")    # 处理完标记为.old，避免程序重启后重新全部识别
