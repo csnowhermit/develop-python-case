@@ -41,6 +41,7 @@ from wsgiref.handlers import format_date_time
 from datetime import datetime
 from time import mktime
 import _thread as thread
+import demjson
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
@@ -114,6 +115,14 @@ def on_message(ws, message):
                 for w in i["cw"]:
                     result += w["w"]
             print("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
+
+            json_obj = json.dumps(data, ensure_ascii=False)
+            json_obj = json.loads(json_obj)
+            text = ""
+            for obj in json_obj:
+                text = text + obj["cw"][0]["w"]
+            print("识别结果：", text)
+
             file.write("sid:%s call success!,data is:%s \n" % (sid, json.dumps(data, ensure_ascii=False)))
             file.flush()
     except Exception as e:
@@ -191,6 +200,8 @@ if __name__ == "__main__":
     #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/ST-CMDS-20170001_1-OS/']
     dir_paths = ['D:/data/iat_tingxie/']
 
+    already_read = []    # 已读文件列表
+
     while True:
         # 录音
         from NLS.speech_recognition.Audio2WAV import get_audio
@@ -204,27 +215,25 @@ if __name__ == "__main__":
             for filename in os.listdir(dpath):
                 if filename.endswith(".wav"):
                     fullPath = dpath + filename
-                    print(fullPath)
-                    file.write(fullPath + "\n")
-                    file.flush()
 
-                    time1 = datetime.now()
-                    wsParam = Ws_Param(APPID='5d760a37',
-                                       APIKey='0881cf5a9cb3548c79e654b26f77b572',
-                                       APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                                       AudioFile=fullPath)
-                    websocket.enableTrace(False)
-                    wsUrl = wsParam.create_url()
-                    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-                    ws.on_open = on_open
-                    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-                    time2 = datetime.now()
-                    print(time2 - time1)
+                    if fullPath not in already_read:
+                        print("已读：", fullPath)
+                        already_read.append(fullPath)
+                        file.write(fullPath + "\n")
+                        file.flush()
 
+                        time1 = datetime.now()
+                        wsParam = Ws_Param(APPID='5d760a37',
+                                           APIKey='0881cf5a9cb3548c79e654b26f77b572',
+                                           APISecret='c340e2627a9c1697c117769dbdbb12d5',
+                                           AudioFile=fullPath)
+                        websocket.enableTrace(False)
+                        wsUrl = wsParam.create_url()
+                        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+                        ws.on_open = on_open
+                        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+                        time2 = datetime.now()
+                        print(time2 - time1)
+                    else:
+                        continue
                     time.sleep(random.randint(2, 10))
-
-                    os.remove(fullPath)  # 处理完之后把文件删掉
-
-
-
-
