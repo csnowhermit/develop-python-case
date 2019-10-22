@@ -51,5 +51,5 @@ def get_audio(filepath):
         print("无效输入，请重新选择")
         get_audio(in_path)
 
-
-# get_audio(in_path)
+# if __name__ == '__main__':
+#     get_audio(in_path)
