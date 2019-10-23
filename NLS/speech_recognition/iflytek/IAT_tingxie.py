@@ -203,14 +203,14 @@ if __name__ == "__main__":
     already_read = []    # 已读文件列表
 
     while True:
-        # 录音
+        # 1.录音
         from NLS.speech_recognition.Audio2WAV import get_audio
 
         inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
         # print(inputfile)
         get_audio(inputfile)
 
-        # 解析
+        # 2.解析
         for dpath in dir_paths:
             for filename in os.listdir(dpath):
                 if filename.endswith(".wav"):
