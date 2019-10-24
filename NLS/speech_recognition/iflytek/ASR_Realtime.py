@@ -23,7 +23,7 @@ logging.basicConfig()
 base_url = "wss://rtasr.xfyun.cn/v1/ws"
 app_id = "5d760a37"
 api_key = "e5aba0511eea04e2ab986cdf1e4b6972"
-file_path = "./test_1.pcm"
+file_path = "./静夜思_李白.pcm"
 
 end_tag = "{\"end\": true}"
 
