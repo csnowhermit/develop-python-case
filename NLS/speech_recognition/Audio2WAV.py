@@ -30,7 +30,10 @@ def get_audio(filepath):
 
         print("*"*10, "开始录音：请在", RECORD_SECONDS, "秒内输入语音")
         frames = []
+        batches = int(RATE / CHUNK)
         for i in range(0, int(RATE / CHUNK * RECORD_SECONDS)):
+            if i % batches == 0:
+                print("\r[{0}]".format(int(RECORD_SECONDS - i / batches)), end='', flush=True)
             data = stream.read(CHUNK)
             frames.append(data)
         print("*"*10, "录音结束\n")
