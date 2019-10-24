@@ -1,6 +1,10 @@
 import sys
 import difflib
 
+'''
+    评估识别效果：正确标注和识别到的进行比对，Python文本比对
+'''
+
 labelsDict = {}    # 正确的标注
 with open("D:/workspace/openSourceModel/ASRT_SpeechRecognition/datalist/thchs30/精简版标注数据-汉字.txt", 'r', encoding='utf-8') as fo:
     for line in fo.readlines():
