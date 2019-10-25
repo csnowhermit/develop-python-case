@@ -188,7 +188,6 @@ def on_open(ws):
 
     thread.start_new_thread(run, ())
 
-
 if __name__ == "__main__":
     # 测试时候在此处正确填写相关信息即可运行
     # 文件：D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_124.wav
@@ -203,12 +202,12 @@ if __name__ == "__main__":
     already_read = []    # 已读文件列表
 
     while True:
-        # 1.录音
-        from NLS.speech_recognition.Audio2WAV import get_audio
-
-        inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
-        # print(inputfile)
-        get_audio(inputfile)
+        # # 1.录音
+        # from NLS.speech_recognition.Audio2WAV import get_audio
+        #
+        # inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
+        # # print(inputfile)
+        # get_audio(inputfile)
 
         # 2.解析
         for dpath in dir_paths:
