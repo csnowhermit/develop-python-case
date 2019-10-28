@@ -202,12 +202,12 @@ if __name__ == "__main__":
     already_read = []    # 已读文件列表
 
     while True:
-        # # 1.录音
-        # from NLS.speech_recognition.Audio2WAV import get_audio
-        #
-        # inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
-        # # print(inputfile)
-        # get_audio(inputfile)
+        # 1.录音
+        from NLS.speech_recognition.Audio2WAV import get_audio
+
+        inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
+        # print(inputfile)
+        get_audio(inputfile)
 
         # 2.解析
         for dpath in dir_paths:
@@ -235,5 +235,5 @@ if __name__ == "__main__":
                         print(time2 - time1)
                     else:
                         continue
-                    time.sleep(random.randint(2, 10))
+                    # time.sleep(random.randint(2, 10))
                     os.rename(fullPath, fullPath + ".old")    # 处理完标记为.old，避免程序重启后重新全部识别
