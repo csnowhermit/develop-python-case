@@ -23,7 +23,7 @@
 # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
 
 '''
-    科大讯飞语音听写：流式版，webAPI
+    科大讯飞语音听写：实时听写，语音数据不落地
 '''
 
 import os
@@ -42,22 +42,37 @@ from datetime import datetime
 from time import mktime
 import _thread as thread
 import demjson
+import pyaudio
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
-file = open("D:/data/iat_tingxie/reco_result.txt", 'w', encoding="utf-8")
-currentFile = ""
+# file = open("D:/data/iat_tingxie/reco_result.txt", 'w', encoding="utf-8")
+# currentFile = ""
 textList = []
+
+CHUNK = 256
+FORMAT = pyaudio.paInt16
+CHANNELS = 1  # 声道数
+RATE = 16000  # 采样率
+RECORD_SECONDS = 60
+
+p = pyaudio.PyAudio()
+
+stream = p.open(format=FORMAT,
+                channels=CHANNELS,
+                rate=RATE,
+                input=True,
+                frames_per_buffer=CHUNK)
+index = 1
 
 class Ws_Param(object):
     # 初始化
-    def __init__(self, APPID, APIKey, APISecret, AudioFile):
+    def __init__(self, APPID, APIKey, APISecret):
         self.APPID = APPID
         self.APIKey = APIKey
         self.APISecret = APISecret
-        self.AudioFile = AudioFile
 
         # 公共参数(common)
         self.CommonArgs = {"app_id": self.APPID}
@@ -106,32 +121,25 @@ def on_message(ws, message):
         if code != 0:
             errMsg = json.loads(message)["message"]
             print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
-            file.write("sid:%s call error:%s code is:%s \n" % (sid, errMsg, code))
-            file.flush()
 
         else:
             data = json.loads(message)["data"]["result"]["ws"]
             # print(json.loads(message))
+            time11 = time.time()
             result = ""
             for i in data:
                 for w in i["cw"]:
                     result += w["w"]
             print("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
-
+            print(time.time() - time11)
             json_obj = json.dumps(data, ensure_ascii=False)
             json_obj = json.loads(json_obj)
             text = ""
             for obj in json_obj:
                 text = text + obj["cw"][0]["w"]
-            # print("识别结果：", text)
-            textList.append(text)
-
-            file.write("sid:%s call success!,data is:%s \n" % (sid, json.dumps(data, ensure_ascii=False)))
-            file.flush()
+            print("识别结果：", text)
     except Exception as e:
         print("receive msg,but parse exception:", e)
-        file.write("receive msg,but parse exception:%s \n" % (e))
-        file.flush()
 
 
 
@@ -143,6 +151,13 @@ def on_error(ws, error):
 # 收到websocket关闭的处理
 def on_close(ws):
     print("### closed ###")
+    # 连接因超时断开后自动重连
+    time.sleep(0.2)
+    wsUrl = wsParam.create_url()
+    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+    ws.on_open = on_open
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    print("### 已重连 ###")
 
 
 # 收到websocket连接建立的处理
@@ -152,101 +167,58 @@ def on_open(ws):
         intervel = 0.04  # 发送音频间隔(单位:s)
         status = STATUS_FIRST_FRAME  # 音频的状态信息，标识音频是第一帧，还是中间帧、最后一帧
 
-        with open(wsParam.AudioFile, "rb") as fp:
-            while True:
-                buf = fp.read(frameSize)
-                print(type(buf), len(buf))
-                # 文件结束
-                if not buf:
-                    status = STATUS_LAST_FRAME
-                # 第一帧处理
-                # 发送第一帧音频，带business 参数
-                # appid 必须带上，只需第一帧发送
-                if status == STATUS_FIRST_FRAME:
+        global index
+        # print("已录音 \r[{0}] 秒".format(int(index), end='', flush=True))
 
-                    d = {"common": wsParam.CommonArgs,
-                         "business": wsParam.BusinessArgs,
-                         "data": {"status": 0, "format": "audio/L16;rate=16000",
-                                  "audio": str(base64.b64encode(buf), 'utf-8'),
-                                  "encoding": "raw"}}
-                    d = json.dumps(d)
-                    ws.send(d)
-                    status = STATUS_CONTINUE_FRAME
-                # 中间帧处理
-                elif status == STATUS_CONTINUE_FRAME:
-                    d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
-                                  "audio": str(base64.b64encode(buf), 'utf-8'),
-                                  "encoding": "raw"}}
-                    ws.send(json.dumps(d))
-                # 最后一帧处理
-                elif status == STATUS_LAST_FRAME:
-                    d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
-                                  "audio": str(base64.b64encode(buf), 'utf-8'),
-                                  "encoding": "raw"}}
-                    ws.send(json.dumps(d))
-                    time.sleep(1)
-                    break
-                # 模拟音频采样间隔
-                time.sleep(intervel)
+        while True:
+            buf = stream.read(int(frameSize/4))
+
+            # print(type(buf), len(buf), index)
+            # 文件结束
+            if not buf:
+                status = STATUS_LAST_FRAME
+            # 第一帧处理
+            # 发送第一帧音频，带business 参数
+            # appid 必须带上，只需第一帧发送
+            if status == STATUS_FIRST_FRAME:
+
+                d = {"common": wsParam.CommonArgs,
+                     "business": wsParam.BusinessArgs,
+                     "data": {"status": 0, "format": "audio/L16;rate=16000",
+                              "audio": str(base64.b64encode(buf), 'utf-8'),
+                              "encoding": "raw"}}
+                d = json.dumps(d)
+                ws.send(d)
+                status = STATUS_CONTINUE_FRAME
+            # 中间帧处理
+            elif status == STATUS_CONTINUE_FRAME:
+                d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
+                              "audio": str(base64.b64encode(buf), 'utf-8'),
+                              "encoding": "raw"}}
+                ws.send(json.dumps(d))
+            # 最后一帧处理
+            elif status == STATUS_LAST_FRAME:
+                d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
+                              "audio": str(base64.b64encode(buf), 'utf-8'),
+                              "encoding": "raw"}}
+                ws.send(json.dumps(d))
+                time.sleep(1)
+                break
+            # 模拟音频采样间隔
+            time.sleep(intervel)
+            index = index + 1
         ws.close()
 
     thread.start_new_thread(run, ())
 
+
 if __name__ == "__main__":
-    # 测试时候在此处正确填写相关信息即可运行
-    # 文件：D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/data/A11_124.wav
-    # WAV内容：另外，女单中国队，还有韩西娜和姚彦，奥运排名第67位，也可以高手一搏。
+    wsParam = Ws_Param(APPID='5d760a37',
+                       APIKey='0881cf5a9cb3548c79e654b26f77b572',
+                       APISecret='c340e2627a9c1697c117769dbdbb12d5')
+    websocket.enableTrace(False)
+    wsUrl = wsParam.create_url()
+    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+    ws.on_open = on_open
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-    # dir_paths = ['D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/train/',
-    #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/test/',
-    #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/dev/',
-    #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/ST-CMDS-20170001_1-OS/']
-    dir_paths = ['D:/data/iat_tingxie/']
-
-    already_read = []    # 已读文件列表
-
-    while True:
-        # # 1.录音
-        # from NLS.speech_recognition.Audio2WAV import get_audio
-        #
-        # inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
-        # # print(inputfile)
-        # get_audio(inputfile)
-
-        # 2.解析
-        time.sleep(random.randint(2, 5))
-        for dpath in dir_paths:
-            for filename in os.listdir(dpath):
-                if filename.endswith(".wav"):
-                    fullPath = dpath + filename
-
-                    if fullPath not in already_read:
-                        print("已读：", fullPath)
-                        already_read.append(fullPath)
-                        currentFile = fullPath
-                        file.write(fullPath + "\n")
-                        file.flush()
-
-                        time1 = datetime.now()
-                        wsParam = Ws_Param(APPID='5d760a37',
-                                           APIKey='0881cf5a9cb3548c79e654b26f77b572',
-                                           APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                                           AudioFile=fullPath)
-                        websocket.enableTrace(False)
-                        wsUrl = wsParam.create_url()
-                        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-                        ws.on_open = on_open
-                        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-                        time2 = datetime.now()
-                        print(time2 - time1)
-
-                        content = ""  # 完整的句子
-                        for s in textList:
-                            content = content + str(s)
-
-                        textList = []  # 用完之后将列表置空
-                        print(currentFile + " >>> " + content)
-                    else:
-                        continue
-                    time.sleep(random.randint(2, 5))
-                    os.rename(fullPath, fullPath + ".old")    # 处理完标记为.old，避免程序重启后重新全部识别
