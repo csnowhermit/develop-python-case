@@ -47,7 +47,7 @@ class Client():
         try:
             index = 1
             while True:
-                chunk = file_object.read(1280)
+                chunk = file_object.read(1280)    # 实施转写问题，可以实时往pcm中写入
                 if not chunk:
                     break
                 self.ws.send(chunk)

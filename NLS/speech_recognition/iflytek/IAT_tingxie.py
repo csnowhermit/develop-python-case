@@ -48,6 +48,8 @@ STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
 file = open("D:/data/iat_tingxie/reco_result.txt", 'w', encoding="utf-8")
+currentFile = ""
+textList = []
 
 class Ws_Param(object):
     # 初始化
@@ -121,7 +123,8 @@ def on_message(ws, message):
             text = ""
             for obj in json_obj:
                 text = text + obj["cw"][0]["w"]
-            print("识别结果：", text)
+            # print("识别结果：", text)
+            textList.append(text)
 
             file.write("sid:%s call success!,data is:%s \n" % (sid, json.dumps(data, ensure_ascii=False)))
             file.flush()
@@ -202,14 +205,15 @@ if __name__ == "__main__":
     already_read = []    # 已读文件列表
 
     while True:
-        # 1.录音
-        from NLS.speech_recognition.Audio2WAV import get_audio
-
-        inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
-        # print(inputfile)
-        get_audio(inputfile)
+        # # 1.录音
+        # from NLS.speech_recognition.Audio2WAV import get_audio
+        #
+        # inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
+        # # print(inputfile)
+        # get_audio(inputfile)
 
         # 2.解析
+        time.sleep(random.randint(2, 5))
         for dpath in dir_paths:
             for filename in os.listdir(dpath):
                 if filename.endswith(".wav"):
@@ -218,6 +222,7 @@ if __name__ == "__main__":
                     if fullPath not in already_read:
                         print("已读：", fullPath)
                         already_read.append(fullPath)
+                        currentFile = fullPath
                         file.write(fullPath + "\n")
                         file.flush()
 
@@ -233,7 +238,14 @@ if __name__ == "__main__":
                         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
                         time2 = datetime.now()
                         print(time2 - time1)
+
+                        content = ""  # 完整的句子
+                        for s in textList:
+                            content = content + str(s)
+
+                        textList = []  # 用完之后将列表置空
+                        print(currentFile + " >>> " + content)
                     else:
                         continue
-                    # time.sleep(random.randint(2, 10))
+                    time.sleep(random.randint(2, 5))
                     os.rename(fullPath, fullPath + ".old")    # 处理完标记为.old，避免程序重启后重新全部识别
