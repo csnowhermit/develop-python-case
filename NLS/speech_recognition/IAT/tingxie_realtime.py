@@ -151,13 +151,24 @@ def on_error(ws, error):
 # 收到websocket关闭的处理
 def on_close(ws):
     print("### closed ###")
-    # 连接因超时断开后自动重连
-    time.sleep(0.2)
-    wsUrl = wsParam.create_url()
-    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-    print("### 已重连 ###")
+    while True:
+        ss = input("是否自动重连？（y/N）")
+        if ss == str("y"):
+            # 连接因超时断开后自动重连
+            time.sleep(0.2)
+            wsUrl = wsParam.create_url()
+            ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+            ws.on_open = on_open
+            ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+            print("### 已重连 ###")
+            break
+        elif ss == str("N"):
+            print("不重连")
+            break
+        else:
+            continue
+
+
 
 
 # 收到websocket连接建立的处理
@@ -221,4 +232,3 @@ if __name__ == "__main__":
     ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
     ws.on_open = on_open
     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-

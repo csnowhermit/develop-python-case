@@ -21,10 +21,12 @@ import logging
 logging.basicConfig()
 
 base_url = "wss://rtasr.xfyun.cn/v1/ws"
-app_id = "5d760a37"
-api_key = "e5aba0511eea04e2ab986cdf1e4b6972"
-# file_path = "./静夜思_李白.pcm"
-file_path = "D:/data/iat_tingxie/157242600644468.wav"
+# app_id = "5d760a37"
+# api_key = "e5aba0511eea04e2ab986cdf1e4b6972"
+app_id = "5dc4b509"
+api_key = "155b5599042f7187727214ba5af7b3ef"
+file_path = "./静夜思_李白.pcm"
+# file_path = "D:/data/iat_tingxie/157242600644468.wav"
 
 end_tag = "{\"end\": true}"
 
@@ -88,8 +90,6 @@ class Client():
     def close(self):
         self.ws.close()
         print("connection closed")
-
-
 
 
 if __name__ == '__main__':

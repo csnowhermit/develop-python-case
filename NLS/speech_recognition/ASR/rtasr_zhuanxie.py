@@ -20,9 +20,11 @@ import pyaudio
 logging.basicConfig()
 
 base_url = "wss://rtasr.xfyun.cn/v1/ws"
-app_id = "5d760a37"
-api_key = "e5aba0511eea04e2ab986cdf1e4b6972"
-# file_path = "../iflytek/静夜思_李白.pcm"
+# app_id = "5d760a37"
+# api_key = "e5aba0511eea04e2ab986cdf1e4b6972"
+app_id = "5dc4b509"
+api_key = "155b5599042f7187727214ba5af7b3ef"
+file_path = "../iflytek/静夜思_李白.pcm"
 # file_path = "D:/data/iat_tingxie/157242600644468.wav"
 
 end_tag = "{\"end\": true}"
@@ -31,7 +33,6 @@ CHUNK = 256
 FORMAT = pyaudio.paInt16
 CHANNELS = 1  # 声道数
 RATE = 16000  # 采样率
-# RECORD_SECONDS = 60
 
 p = pyaudio.PyAudio()
 
@@ -40,6 +41,7 @@ stream = p.open(format=FORMAT,
                 rate=RATE,
                 input=True,
                 frames_per_buffer=CHUNK)
+index = 1
 
 class Client():
     def __init__(self):
@@ -59,15 +61,15 @@ class Client():
     def send(self):
         # file_object = open(file_path, 'rb')
         try:
-            index = 1
             while True:
                 # chunk = file_object.read(1280)    # 实施转写问题，可以实时往pcm中写入
-                chunk = stream.read(1280)
-                print(type(chunk), len(chunk), index)
+                chunk = stream.read(640)
+                # print(type(chunk), len(chunk), index)
                 if not chunk:      # 如果当前没读到，说明暂时没人问，continue
                     continue
                 # self.ws.send(chunk)      # 分批发送识别
 
+                global index
                 index += 1
                 time.sleep(0.04)
         finally:
