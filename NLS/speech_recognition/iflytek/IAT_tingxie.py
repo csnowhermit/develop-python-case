@@ -116,7 +116,7 @@ def on_message(ws, message):
             for i in data:
                 for w in i["cw"]:
                     result += w["w"]
-            print("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
+            # print("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
 
             json_obj = json.dumps(data, ensure_ascii=False)
             json_obj = json.loads(json_obj)
@@ -155,7 +155,7 @@ def on_open(ws):
         with open(wsParam.AudioFile, "rb") as fp:
             while True:
                 buf = fp.read(frameSize)
-                print(type(buf), len(buf))
+                # print(type(buf), len(buf))
                 # 文件结束
                 if not buf:
                     status = STATUS_LAST_FRAME
@@ -201,7 +201,7 @@ if __name__ == "__main__":
     #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/test/',
     #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/data_thchs30/dev/',
     #              'D:/workspace/openSourceModel/ASRT_SpeechRecognition/dataset/ST-CMDS-20170001_1-OS/']
-    dir_paths = ['D:/data/iat_tingxie/']
+    dir_paths = ['D:/data/南站现场/广南一层中间12306录wav20191030/']
 
     already_read = []    # 已读文件列表
 
@@ -214,7 +214,7 @@ if __name__ == "__main__":
         # get_audio(inputfile)
 
         # 2.解析
-        time.sleep(random.randint(2, 5))
+        time.sleep(random.randint(1, 3))
         for dpath in dir_paths:
             for filename in os.listdir(dpath):
                 if filename.endswith(".wav"):
@@ -245,8 +245,11 @@ if __name__ == "__main__":
                             content = content + str(s)
 
                         textList = []  # 用完之后将列表置空
-                        print(currentFile + " >>> " + content)
+                        if len(content) == 0 or len(content.strip()) == 0:
+                            print(currentFile + " >>> None")
+                        else:
+                            print(currentFile + " >>> " + content)
                     else:
                         continue
-                    time.sleep(random.randint(2, 5))
+                    time.sleep(random.randint(1, 3))
                     os.rename(fullPath, fullPath + ".old")    # 处理完标记为.old，避免程序重启后重新全部识别

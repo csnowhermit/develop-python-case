@@ -28,6 +28,7 @@ s = "便利店能还充电宝吗"
 # print(s[s.rindex("/")+1:].replace(".", "_")+".wav")
 
 
-with open("D:/奇辉电子/智能引导灯/知识库.txt", encoding="utf-8") as fo:
-    for line in fo.readlines():
-        print(line.split("\t")[0], end=', ')
+# with open("D:/奇辉电子/智能引导灯/知识库.txt", encoding="utf-8") as fo:
+#     for line in fo.readlines():
+#         print(line.split("\t")[0], end=', ')
+
