@@ -187,7 +187,7 @@ def main():
         # multinamialNB(train_set, train_label, test_set, test_label)
         # bernousNB(train_set, train_label, test_set, test_label)
 
-    ## 新想法：全部数据用来训练，新截取关键词用来测试
+    ## 新想法：全部数据用来训练，新截取关键词用来测试（7:3划分训练集，由于数据集较小，部分情况训练不到）
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
     train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
