@@ -15,9 +15,17 @@ from sklearn.externals import joblib
     贝叶斯：文本分类
 '''
 
-jieba.load_userdict("../atomic.txt")    # 不可切分词
-multinamialNB_save_path = "./model/multinamialNB/"
-bernousNB_save_path = "./model/bernousNB/"
+atomic_file = "../atomic.txt"                   # 不可切分词
+origin_sentences_file = "../原始例句.txt"       # 原始例句
+keywords_intention_file = "../keywords_intention.txt"      # 整理后的关键字-意图
+stopwords_file = "../stopwords.txt"            # 停用词
+zhuhai_station_file = "../zhuhai.txt"          # 珠海方向车站
+others_station_file = "../others.txt"          # 其他方向车站
+
+multinamialNB_save_path = "./model/multinamialNB/"    # 多项式分类器模型保存路径
+bernousNB_save_path = "./model/bernousNB/"            # 伯努利分类器模型保存路径
+
+jieba.load_userdict(atomic_file)    # 不可切分词
 
 if os.path.exists(multinamialNB_save_path) is False:
     os.mkdir(multinamialNB_save_path)
@@ -31,7 +39,7 @@ if os.path.exists(bernousNB_save_path) is False:
 '''
 def get_dataset():
     data = []
-    with open("../原始例句.txt", encoding="utf-8", errors="ignore") as fo:
+    with open(origin_sentences_file, encoding="utf-8", errors="ignore") as fo:
         for line in fo.readlines():
             arr = line.strip().split("\t")
             data.append((get_words(arr[0]), arr[1]))
@@ -43,7 +51,7 @@ def get_dataset():
 '''
 def load_dataset():
     data = []
-    with open("../keywords_intention.txt", encoding="utf-8", errors="ignore") as fo:
+    with open(keywords_intention_file, encoding="utf-8", errors="ignore") as fo:
         for line in fo.readlines():
             arr = line.strip().split("\t")
             data.append((arr[0].replace(",", " "), arr[1]))
@@ -58,15 +66,15 @@ def getWordList(filepath):
             keySet.append(line.strip())
     return set(keySet)
 
-zhuhai_c = getWordList("../zhuhai.txt")
-others = getWordList("../others.txt")
+zhuhai_c = getWordList(zhuhai_station_file)
+others = getWordList(others_station_file)
 
 '''
     获取所有关键字
 '''
 def getAllKeywords(zhuhai_c, others):
     keywords = []
-    with open("../keywords_intention.txt", encoding="utf-8") as fo:
+    with open(keywords_intention_file, encoding="utf-8") as fo:
         lines = fo.readlines()
         for line in lines:
             arr = line.strip().split("\t")
@@ -80,7 +88,7 @@ def getAllKeywords(zhuhai_c, others):
     return set(keywords)
 
 keywords = getAllKeywords(zhuhai_c, others)
-stopwords = getWordList("../stopwords.txt")
+stopwords = getWordList(stopwords_file)
 
 
 '''
@@ -159,7 +167,6 @@ def bernousNB(train_set, train_label, test_set, test_label):
             if str(tset).__contains__("这个"):    # 如果存在“这个”关键字时，需进一步判断
                 pass
     print("伯努利分类器准确率：", count / len(test_label))
-    joblib.dump(nbc_1, "bernousNB.m")
     joblib.dump(nbc_1, bernousNB_save_path + "bernousNB_" + str(int(time.time())) + ".m")
 
 
