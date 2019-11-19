@@ -17,6 +17,7 @@ from NLP.textCategory.bayes.bayes_train import *
     回归树：使用最大均方差来划分节点，每个节点样本的均值作为测试样本的回归预测值。
         回归树要求训练和测试label为float类型，因为需要计算均分方差。（文本分类场景不适合回归树）
     分类树中观察值为离散变量，回归树中观察值为连续变量。
+    决策树调参过程：https://www.cnblogs.com/lyxML/p/9575820.html
 '''
 
 decisionTreeClassifier_model_path = "./model/"
@@ -47,7 +48,8 @@ def buildFeatureMat(data, keywords):
 def buildDecisionTree(train_set, train_label, test_set, test_label):
     clf = tree.DecisionTreeClassifier(criterion="gini",
                                       splitter="best",
-                                      max_features=5
+                                      max_features=4,    # 最大考虑几个特征
+                                      max_depth=4        # 最大深度，避免过拟合
                                       )  # 初始化树模型，entropy，基于信息熵；gini，基尼系数
     # 回归树采用最大均方差来划分节点，每个节点样本的均值作为测试样本的回归预测值。该场景下不能用回归树，会报错：ValueError: could not convert string to float: '人工窗口'
     # clf = tree.DecisionTreeRegressor(criterion="mse")
@@ -75,8 +77,8 @@ def main():
     if os.path.exists(decisionTreeClassifier_model_path) is False:
         os.mkdir(decisionTreeClassifier_model_path)
 
-    for i in range(100):
-        time.sleep(3)
+    for i in range(5):
+        time.sleep(random.randint(2, 5))
         data = load_dataset()  # 从文件加载数据
         test_data = get_dataset()  # 加载原始文本，新切词为测试数据
         mat, labels = buildFeatureMat(data, keywords)  # 构建训练矩阵及label
