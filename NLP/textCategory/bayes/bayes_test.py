@@ -5,7 +5,7 @@ from sklearn.externals import joblib
 from NLP.textCategory.bayes.bayes_train import get_dataset, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path
 
 '''
-    从文件读取模型并进行预测
+    从文件读取模型并进行分类
 '''
 
 test_data = get_dataset()

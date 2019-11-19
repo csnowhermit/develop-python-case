@@ -27,12 +27,6 @@ bernousNB_save_path = "./model/bernousNB/"            # 伯努利分类器模型
 
 jieba.load_userdict(atomic_file)    # 不可切分词
 
-if os.path.exists(multinamialNB_save_path) is False:
-    os.mkdir(multinamialNB_save_path)
-if os.path.exists(bernousNB_save_path) is False:
-    os.mkdir(bernousNB_save_path)
-
-
 
 '''
     加载数据集：最原始文本集
@@ -70,7 +64,7 @@ zhuhai_c = getWordList(zhuhai_station_file)
 others = getWordList(others_station_file)
 
 '''
-    获取所有关键字
+    获取“关键字-意图”文件中所有关键字
 '''
 def getAllKeywords(zhuhai_c, others):
     keywords = []
@@ -173,6 +167,11 @@ def bernousNB(train_set, train_label, test_set, test_label):
 
 
 def main():
+    if os.path.exists(multinamialNB_save_path) is False:
+        os.mkdir(multinamialNB_save_path)
+    if os.path.exists(bernousNB_save_path) is False:
+        os.mkdir(bernousNB_save_path)
+
     # for i in range(100):    # 多轮训练
         # # data = get_dataset()    # 加载最原始的输入数据
         # data = load_dataset()  # 加载手动提取的关键词数据
