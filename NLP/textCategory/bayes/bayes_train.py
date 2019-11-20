@@ -93,9 +93,11 @@ def get_words(line):
     arr = jieba.cut(line)
     for a in arr:
         if a in zhuhai_c:
-            a = "地名1"
+            # a = "地名1"
+            a = "地名"
         elif a in others:
-            a = "地名2"
+            # a = "地名2"
+            a = "地名"
         elif a in keywords:
             a = a
         else:
