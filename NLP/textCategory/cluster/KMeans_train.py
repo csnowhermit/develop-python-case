@@ -26,7 +26,6 @@ for label in test_labels:
             test_labels_num.append(i)
             continue
 
-
 print(test_labels_num)
 predict_list = clf.predict(test_mat)    # 预测的list
 print(predict_list)
