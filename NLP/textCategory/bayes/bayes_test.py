@@ -26,8 +26,8 @@ def get_newest_model(model_path):
     测试多项式分类器
 '''
 def test_bayes(model_file):
-    clf_multi = joblib.load(model_file)
-    predict = clf_multi.predict(test_set)
+    clf = joblib.load(model_file)
+    predict = clf.predict(test_set)
 
     count = 0
     for left, right, tset in zip(predict, test_label, test_set):

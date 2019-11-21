@@ -92,13 +92,13 @@ def get_words(line):
     s = ""
     arr = jieba.cut(line)
     for a in arr:
-        if a in zhuhai_c:
+        if a in zhuhai_c:    # Entity实体（地名）的泛化
             # a = "地名1"
             a = "地名"
-        elif a in others:
+        elif a in others:    # Entity实体（地名）的泛化
             # a = "地名2"
             a = "地名"
-        elif a in keywords:
+        elif a in keywords:    # 其他关键字原样识别
             a = a
         else:
             a = ""
