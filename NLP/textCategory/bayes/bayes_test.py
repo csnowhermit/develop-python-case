@@ -31,7 +31,12 @@ def test_bayes(model_file):
 
     count = 0
     for left, right, tset in zip(predict, test_label, test_set):
-        print(left, "-->", right, "-->", tset)
+        if left == "坐车" and right == "坐车":
+            left = "坐高铁"
+            right = "坐高铁"
+            print(left, "--", right, "--", tset)
+        else:
+            print(left, "--", right, "--", tset)
         if left == right:
             count += 1
     print(model_file, "准确率：", count / len(test_label))
