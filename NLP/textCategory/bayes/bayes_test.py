@@ -12,6 +12,14 @@ test_data = get_dataset()
 train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
 '''
+    分离出来
+'''
+def divideTestSet(test_set):
+    for tset in test_set:
+        print(tset)
+        # pass
+
+'''
     获取最新的模型
 '''
 def get_newest_model(model_path):
@@ -31,12 +39,11 @@ def test_bayes(model_file):
 
     count = 0
     for left, right, tset in zip(predict, test_label, test_set):
-        if left == "坐车" and right == "坐车":
+        if left == "坐车":
             left = "坐高铁"
+        if right == "坐车":
             right = "坐高铁"
-            print(left, "--", right, "--", tset)
-        else:
-            print(left, "--", right, "--", tset)
+        print(left, "--", right, "--", tset)
         if left == right:
             count += 1
     print(model_file, "准确率：", count / len(test_label))
@@ -48,6 +55,7 @@ def main():
     test_bayes(get_newest_model(bernousNB_save_path))
     # print(get_newest_model(multinamialNB_save_path))
     # print(get_newest_model(bernousNB_save_path))
+    # divideTestSet(test_set)
 
 if __name__ == '__main__':
     main()

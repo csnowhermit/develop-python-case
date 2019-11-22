@@ -38,7 +38,12 @@ def get_dataset():
     with open(origin_sentences_file, encoding="utf-8", errors="ignore") as fo:
         for line in fo.readlines():
             arr = line.strip().split("\t")
-            data.append((get_words(arr[0]), arr[1]))
+            new_sentences = get_words(arr[0])
+            if isChat(new_sentences) is False:    # 如果不是闲聊
+                data.append((new_sentences, arr[1]))
+            else:    # 如果过滤掉主干成分之后句子为空，说明是在闲聊，进闲聊处理逻辑
+                pass
+                # chatFunction(line)    # 进闲聊function
     random.shuffle(data)    # 随机打乱
     return data
 
@@ -53,6 +58,21 @@ def load_dataset():
             data.append((arr[0].replace(",", " "), arr[1]))
     random.shuffle(data)    # 随机打乱
     return data
+
+'''
+    是否闲聊：是，返回True；否，返回False
+    定义闲聊：分词列表中，出现len(word)>1的情况，说明不是闲聊；否则定义为闲聊
+'''
+def isChat(sentences):
+    tag = True    # 默认是闲聊
+    if len(str(sentences).strip()) == 0:    # 如果分词列表无内容，则认为是闲聊
+        return tag
+
+    arr = str(sentences).split(" ")
+    for a in arr:
+        if len(a)>1:
+            tag = False    # 标记该问话不是闲聊
+            return tag
 
 
 def getWordList(filepath):
