@@ -10,6 +10,8 @@ from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer, 
 from sklearn import metrics
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.externals import joblib
+from sklearn.naive_bayes import GaussianNB        # 高斯贝叶斯分类器
+from sklearn.naive_bayes import BaseDiscreteNB    # BaseDiscreteNB为抽象类，不能直接进行实例化，应该用基于该抽象类的MultinomialNB和BernoulliNB
 
 '''
     贝叶斯：文本分类
@@ -121,6 +123,28 @@ def split_train_and_test_set(data, rate):
     return train_set, train_label, test_set, test_label
 
 '''
+    高斯贝叶斯分类器
+    不能用：高斯分布需满足数值型，而该场景为标称型
+'''
+def gaussianNB(train_set, train_label, test_set, test_label):
+    nbc = Pipeline([
+        ('vect', TfidfVectorizer(
+
+        )),
+        ('clf', GaussianNB())
+    ])
+
+    nbc.fit(train_set, train_label)  # 训练多项式分类器
+    predict = nbc.predict(test_set)  # 测试分类器分类效果
+    count = 0
+    for left, right, tset in zip(predict, test_label, test_set):
+        print(left, "-->", right, "-->", tset)
+        if left == right:
+            count += 1
+    print("高斯贝叶斯分类器准确率：", count / len(test_label))
+    # joblib.dump(nbc, multinamialNB_save_path + "multinamialNB_" + str(int(time.time())) + ".m")
+
+'''
     多项式分类器
 '''
 def multinamialNB(train_set, train_label, test_set, test_label):
@@ -204,6 +228,7 @@ def main():
     #     print(left, "==>", right)
 
     # 3.训练模型并得出准确率
+    # gaussianNB(train_set, train_label, test_set, test_label)
     multinamialNB(train_set, train_label, test_set, test_label)
     bernousNB(train_set, train_label, test_set, test_label)
 
