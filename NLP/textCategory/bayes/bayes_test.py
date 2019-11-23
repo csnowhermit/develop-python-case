@@ -51,7 +51,7 @@ def test_bayes(model_file):
 
 
 def main():
-    # test_bayes(get_newest_model(multinamialNB_save_path))
+    test_bayes(get_newest_model(multinamialNB_save_path))
     test_bayes(get_newest_model(bernousNB_save_path))
     # print(get_newest_model(multinamialNB_save_path))
     # print(get_newest_model(bernousNB_save_path))
