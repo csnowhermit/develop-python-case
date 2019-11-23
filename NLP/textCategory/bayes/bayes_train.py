@@ -7,7 +7,6 @@ import jieba
 from sklearn.naive_bayes import MultinomialNB
 from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer, CountVectorizer
-from sklearn import metrics
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.externals import joblib
 from sklearn.naive_bayes import GaussianNB        # 高斯贝叶斯分类器
@@ -15,6 +14,11 @@ from sklearn.naive_bayes import BaseDiscreteNB    # BaseDiscreteNB为抽象类�
 
 '''
     贝叶斯：文本分类
+    模型文件命名规范：
+    多项式分类器：multinamialNB_时间戳_准确率_alpha参数值.m。
+        例：multinamialNB_1574499534_82.3256%_0.03.m，1574499534时间，alpha=0.03时，准确率为82.3256%。
+    伯努利分类器：bernousNB_时间戳_准确率_alpha参数值_binarize参数值.m。
+        例：bernousNB_1574499534_82.3256%_0.02_None.m，1574499534时间，alpha=0.02，binarize=None时，准确率为82.3256%。
 '''
 
 atomic_file = "../atomic.txt"                   # 不可切分词
@@ -166,20 +170,28 @@ def gaussianNB(train_set, train_label, test_set, test_label):
 
 '''
     多项式分类器
+    :param alpha：平滑系数，为0表示不平滑
+    :param fit_prior：是否考虑先验概率，True，是；False，否
+    :param class_prior：一个数组，指定每个类别的先验概率P(Y=C_1)、P(Y=C_2)...P(Y=C_k)。默认为None
+    note：当fit_prior=False时候，class_prior填不填没有意义；这时所有类别具有相同先验概率：P(Y=C_k)=1/k，k为类别个数；
+    当fit_prior=True and class_prior=None时，最终先验概率：P(Y=C_k)=m_k/m
+    当fit_prior=True and class_prior<>None时，最终先验概率：P(Y=C_k)=class_prior
 '''
-def multinamialNB(train_set, train_label, test_set, test_label):
+def multinamialNB(train_set, train_label, test_set, test_label, alpha, fit_prior, class_prior):
     nbc = Pipeline([
         ('vect', TfidfVectorizer(
 
         )),
-        ('clf', MultinomialNB(alpha=1.0))
+        ('clf', MultinomialNB(alpha=alpha,
+                              fit_prior=fit_prior,
+                              class_prior=class_prior))
     ])
 
     nbc.fit(train_set, train_label)    # 训练多项式分类器
     predict = nbc.predict(test_set)    # 测试分类器分类效果
     count = 0
     for left, right, tset in zip(predict, test_label, test_set):
-        print(left, "-->", right, "-->", tset)
+        # print(left, "-->", right, "-->", tset)
         if left == right:
             count += 1
     print("多项式分类器准确率：", count/len(test_label))
@@ -187,19 +199,26 @@ def multinamialNB(train_set, train_label, test_set, test_label):
 
 '''
     伯努利分类器
+    :param alpha：平滑系数，为0表示不平滑
+    :param binarize：一个浮点是，特征值大于它，为1；小于它，为0。或者为None，表示已经是二元化了
+    :param fit_prior：是否考虑先验概率，True，是；False，否
+    :param class_prior：一个数组，指定每个类别的先验概率P(Y=C_1)、P(Y=C_2)...P(Y=C_k)。默认为None
 '''
-def bernousNB(train_set, train_label, test_set, test_label):
+def bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior):
     nbc_1 = Pipeline([
         ('vect', TfidfVectorizer(
 
         )),
-        ('clf', BernoulliNB(alpha=0.1))
+        ('clf', BernoulliNB(alpha=alpha,
+                            binarize=binarize,
+                            fit_prior=fit_prior,
+                            class_prior=class_prior))
     ])
     nbc_1.fit(train_set, train_label)
     predict = nbc_1.predict(test_set)  # 在测试集上预测结果
     count = 0  # 统计预测正确的结果个数
     for left, right, tset in zip(predict, test_label, test_set):
-        print(left, "-->", right, "-->", tset)
+        # print(left, "-->", right, "-->", tset)
         if left == right:
             count += 1
         else:
@@ -209,6 +228,46 @@ def bernousNB(train_set, train_label, test_set, test_label):
     print("伯努利分类器准确率：", count / len(test_label))
     joblib.dump(nbc_1, bernousNB_save_path + "bernousNB_" + str(int(time.time())) + ".m")
 
+'''
+    多轮训练模型，找最优的参数组合
+'''
+def trainModel():
+    # 1.加载准备好的关键词及意图，作为训练数据集
+    org_data = load_dataset()
+    train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
+
+    # 2.加载原始数据，现场切词，作为测试数据集
+    test_data = get_dataset()
+    train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
+
+    # # 训练多项式分类器
+    # alpha = 0.0
+    # fit_prior = True    # 考虑先验概率
+    # class_prior = None    # 不手动指定每个类别的先验概率
+    # for i in range(100):
+    #     print(alpha, end=',')
+    #     multinamialNB(train_set, train_label, test_set, test_label, alpha, fit_prior, class_prior)
+    #     alpha = alpha + 0.01
+
+    # # 训练伯努利分类器
+    alpha = 0.0  # 平滑度
+    # binarize=0.0   # 特征1/0的分界线
+    fit_prior = True  # 考虑先验概率
+    class_prior = None  # 不手动指定每个类别的先验概率
+    # for i in range(100):
+    #     for j in range(100):
+    #         print(alpha, binarize, end=',')
+    #         bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior)
+    #         binarize = binarize + 0.01
+    #     alpha = alpha + 0.01
+    #     binarize = 0.0    # 每一轮alpha算完之后，都将binarize归位
+
+    # 伯努利分类器binarize为None的情况
+    binarize = None
+    for i in range(100):
+        print(alpha, end=',')
+        bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior)
+        alpha = alpha + 0.01
 
 
 
@@ -249,8 +308,20 @@ def main():
 
     # 3.训练模型并得出准确率
     # gaussianNB(train_set, train_label, test_set, test_label)
-    multinamialNB(train_set, train_label, test_set, test_label)
-    bernousNB(train_set, train_label, test_set, test_label)
+    # 经训练，多项式分类器取一下参数值时，准确率最高
+    multi_alpha = 0.03
+    fit_prior = True
+    class_prior = None
+    multinamialNB(train_set, train_label, test_set, test_label, alpha=multi_alpha, fit_prior=fit_prior, class_prior=class_prior)
+
+    # 经训练，伯努利分类器取以下参数值时，准确率最高
+    ber_alpha = 0.02
+    binarize = None
+    bernousNB(train_set, train_label, test_set, test_label, alpha=ber_alpha, binarize=binarize, fit_prior=fit_prior, class_prior=class_prior)
+
+    # # 多轮训练，找最优的参数组合
+    # trainModel()
+
 
 
 if __name__ == '__main__':
