@@ -343,12 +343,11 @@ def main():
     # test_data = get_dataset()
     # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
-    # # 3.多轮训练多项式分类器
-    # trainMultinamialNB()
+    # 3.多轮训练多项式分类器
+    trainMultinamialNB()
 
     # 4.多轮训练伯努利分类器
     trainBinarize()
-
 
 
 if __name__ == '__main__':
