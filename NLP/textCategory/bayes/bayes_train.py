@@ -308,15 +308,15 @@ def main():
 
     # 3.训练模型并得出准确率
     # gaussianNB(train_set, train_label, test_set, test_label)
-    # 经训练，多项式分类器取一下参数值时，准确率最高
-    multi_alpha = 0.03
+    # # 经训练，多项式分类器取一下参数值时，准确率最高
+    # multi_alpha = 0.03
     fit_prior = True
     class_prior = None
-    multinamialNB(train_set, train_label, test_set, test_label, alpha=multi_alpha, fit_prior=fit_prior, class_prior=class_prior)
+    # multinamialNB(train_set, train_label, test_set, test_label, alpha=multi_alpha, fit_prior=fit_prior, class_prior=class_prior)
 
-    # 经训练，伯努利分类器取以下参数值时，准确率最高
-    ber_alpha = 0.02
-    binarize = None
+    # 经训练，伯努利分类器取以下参数值时（0.02，None），准确率最高
+    ber_alpha = 0.03
+    binarize = 0.41
     bernousNB(train_set, train_label, test_set, test_label, alpha=ber_alpha, binarize=binarize, fit_prior=fit_prior, class_prior=class_prior)
 
     # # 多轮训练，找最优的参数组合

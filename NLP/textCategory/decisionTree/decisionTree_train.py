@@ -58,7 +58,7 @@ def buildDecisionTree(train_set, train_label, test_set, test_label):
     print("模型准确率：", score)
 
     # 持久化模型
-    joblib.dump(clf, decisionTreeClassifier_model_path + "decisionTreeClassifier_" + str(int(time.time())) + ".m")
+    # joblib.dump(clf, decisionTreeClassifier_model_path + "decisionTreeClassifier_" + str(int(time.time())) + ".m")
 
     # 图像显示决策树
     dot_data = tree.export_graphviz(clf,
@@ -81,7 +81,7 @@ def main():
         time.sleep(random.randint(2, 5))
         data = load_dataset()  # 从文件加载数据
         test_data = get_dataset()  # 加载原始文本，新切词为测试数据
-        mat, labels = buildFeatureMat(data, keywords)  # 构建训练矩阵及label
+        mat, labels = buildFeatureMat(data, keywords)  # 构建特征矩阵及label
         test_mat, test_labels = buildFeatureMat(test_data, keywords)  # 构建测试矩阵及label
 
         # train_set, test_set_tmp, train_label, test_label_tmp = train_test_split(mat, labels, test_size=0.0)

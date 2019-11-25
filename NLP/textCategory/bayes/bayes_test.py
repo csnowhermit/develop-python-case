@@ -31,7 +31,7 @@ def get_newest_model(model_path):
 
 
 '''
-    测试多项式分类器
+    测试贝叶斯分类器
 '''
 def test_bayes(model_file):
     clf = joblib.load(model_file)
