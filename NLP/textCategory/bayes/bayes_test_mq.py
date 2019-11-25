@@ -13,10 +13,10 @@ from kafka import KafkaConsumer
 bootstrap_server = "192.168.117.101:9092,192.168.117.102:9092,192.168.117.103:9092"
 topic = "daotai"
 
-consumer = KafkaConsumer(topic, auto_offset_reset='earliest', bootstrap_servers=bootstrap_server)
-print(consumer)
+consumer = KafkaConsumer(topic, auto_offset_reset='latest', bootstrap_servers=bootstrap_server)
+# print(consumer)
 
-test_data = get_dataset()
+# test_data = get_dataset()
 # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
 '''
