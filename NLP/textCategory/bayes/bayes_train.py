@@ -43,7 +43,7 @@ def get_dataset():
         for line in fo.readlines():
             arr = line.strip().split("\t")
             new_sentences = get_words(arr[0])
-            if isChat(new_sentences) is False:    # 如果不是闲聊
+            if isChat(new_sentences) is False:    # 如果不是闲聊，训练的时候过滤掉闲聊内容
                 data.append((new_sentences, arr[1]))
             else:    # 如果过滤掉主干成分之后句子为空，说明是在闲聊，进闲聊处理逻辑
                 pass
