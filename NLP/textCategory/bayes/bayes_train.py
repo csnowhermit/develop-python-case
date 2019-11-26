@@ -196,7 +196,7 @@ def multinamialNB(train_set, train_label, test_set, test_label, alpha, fit_prior
         if left == right:
             count += 1
     right_rate = count/len(test_label)
-    print("多项式分类器准确率：", right_rate)
+    print("multinamialNB:", right_rate)
 
     # 如果需要持久化，则将模型导出
     if persist is True:
@@ -236,7 +236,7 @@ def bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit
             if str(tset).__contains__("这个"):    # 如果存在“这个”关键字时，需进一步判断
                 pass
     right_rate = count / len(test_label)
-    print("伯努利分类器准确率：", count / len(test_label))
+    print("bernousNB:", count / len(test_label))
 
     if persist is True:
         joblib.dump(nbc_1, bernousNB_save_path + "bernousNB_" +
@@ -248,8 +248,9 @@ def bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit
 
 '''
     多轮训练模型，训练多项式分类器，找最优的参数组合，并保存至模型文件
+    :param num：训练轮数，从多少轮中找最优
 '''
-def trainMultinamialNB():
+def trainMultinamialNB(num):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
     train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
@@ -259,16 +260,17 @@ def trainMultinamialNB():
     train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []    # 保存每轮训练的参数及准确率
+    alpha_increase_rate = float(1 / num)
 
     # 3.训练多项式分类器
     alpha = 0.0
     fit_prior = True    # 考虑先验概率
     class_prior = None    # 不手动指定每个类别的先验概率
-    for i in range(100):
+    for i in range(num):
         print(alpha, end=',')
         right_rate = multinamialNB(train_set, train_label, test_set, test_label, alpha, fit_prior, class_prior, persist=False)
         result.append((alpha, right_rate))
-        alpha = alpha + 0.01
+        alpha = alpha + alpha_increase_rate
 
     # 4.处理，找出最优的参数组合并导出模型
     scores = max([i[1] for i in result])  # 最大准确率
@@ -279,8 +281,9 @@ def trainMultinamialNB():
 
 '''
     多轮训练模型：训练伯努利分类器，找最优的参数组合，并保存至模型文件
+    :param num：训练轮数，从多少轮中找最优
 '''
-def trainBinarize():
+def trainBinarize(num):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
     train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
@@ -290,30 +293,32 @@ def trainBinarize():
     train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []  # 保存每轮训练的参数及准确率
+    alpha_increase_rate = float(1 / num)
+    binarize_increase_rate = float(1 / num)
 
     # 3.伯努利分类器，不考虑特征1/0的分界线
     alpha = 0.0  # 平滑度
     binarize = None
     fit_prior = True  # 考虑先验概率
     class_prior = None  # 不手动指定每个类别的先验概率
-    for i in range(100):
+    for i in range(num):
         print(alpha, end=',')
         right_rate = bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior, persist=False)
         result.append((alpha, binarize, right_rate))
-        alpha = alpha + 0.01
+        alpha = alpha + alpha_increase_rate
 
     # 4.伯努利分类器，指定值作为特征1/0的分界线
     alpha = 0.0  # 平滑度归零，继续训练
     binarize=0.0   # 特征1/0的分界线
     fit_prior = True  # 考虑先验概率
     class_prior = None  # 不手动指定每个类别的先验概率
-    for i in range(100):
-        for j in range(100):
+    for i in range(num):
+        for j in range(num):
             print(alpha, binarize, end=',')
             right_rate = bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior, persist=False)
             result.append((alpha, binarize, right_rate))
-            binarize = binarize + 0.01
-        alpha = alpha + 0.01
+            binarize = binarize + binarize_increase_rate
+        alpha = alpha + alpha_increase_rate
         binarize = 0.0    # 每一轮alpha算完之后，都将binarize归位
 
     # 5.处理，找出最优的参数组合并导出模型
@@ -343,11 +348,11 @@ def main():
     # test_data = get_dataset()
     # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
-    # 3.多轮训练多项式分类器
-    trainMultinamialNB()
+    # # 3.多轮训练多项式分类器
+    # trainMultinamialNB(100)
 
     # 4.多轮训练伯努利分类器
-    trainBinarize()
+    trainBinarize(100)
 
 
 if __name__ == '__main__':
