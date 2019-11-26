@@ -6,6 +6,7 @@ import win32com.client
 
 '''
     IAT语音听写：输入为本地wav文件
+    参考自：https://blog.csdn.net/zzz_cming/article/details/81738317
 '''
 
 
@@ -60,6 +61,7 @@ class Msp:
         time.sleep(0.1)
         while wavData:
             wavData = wavFile.read(piceLne)
+            print(type(wavData), wavData)
             if len(wavData) == 0:
                 break
             ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_CONTINUE, byref(epStatus),

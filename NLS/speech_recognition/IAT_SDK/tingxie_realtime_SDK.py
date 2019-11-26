@@ -5,12 +5,14 @@ from ctypes import *
 import time
 import pyaudio
 import win32com.client
+import threading, time, queue
 
 '''
     IAT语音听写：输入为麦克风
+    参考自：https://blog.csdn.net/zzz_cming/article/details/81738317
 '''
 
-# FRAME_LEN = 640  # Byte
+FRAME_LEN = 640  # Byte
 MSP_SUCCESS = 0
 # 返回结果状态
 MSP_AUDIO_SAMPLE_FIRST = 1
@@ -39,6 +41,8 @@ stream = p.open(format=FORMAT,
                 frames_per_buffer=CHUNK)
 
 
+# 通过生产者消费者模式处理语音：生产者为pyaudio，消费者为本程序
+
 class Msp:
     def __init__(self):
         pass
@@ -51,7 +55,7 @@ class Msp:
         ret = dll.MSPLogout()
         # print('MSPLogout =>', ret)
 
-    def isr(self, session_begin_params):
+    def isr(self, wavData, session_begin_params):
         ret = c_int()
         sessionID = c_voidp()
         dll.QISRSessionBegin.restype = c_char_p
@@ -67,51 +71,27 @@ class Msp:
         recogStatus = c_int(0)
         cnt = 0
         frameSize = 8000  # 每一帧的音频大小
-        while True:
-            cnt = cnt + 1
-            print(">", cnt)
-            wavData = stream.read(int(frameSize/2))
 
-            ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_FIRST, byref(epStatus), byref(recogStatus))
-            # print('len(wavData):', len(wavData), '\nQISRAudioWrite ret:', ret,'\nepStatus:', epStatus.value, '\nrecogStatus:', recogStatus.value)
+        ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_FIRST, byref(epStatus), byref(recogStatus))
+        # print('len(wavData):', len(wavData), '\nQISRAudioWrite ret:', ret,'\nepStatus:', epStatus.value, '\nrecogStatus:', recogStatus.value)
 
-            time.sleep(0.1)
-            if len(wavData) == 0:    # 如果没采集到语音，跳过继续采集
-                continue
-            ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_CONTINUE, byref(epStatus), byref(recogStatus))
-            # print('len(wavData):', len(wavData), 'QISRAudioWrite ret:', ret, 'epStatus:', epStatus.value, 'recogStatus:', recogStatus.value)
+        ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_CONTINUE, byref(epStatus), byref(recogStatus))
+        # print('len(wavData):', len(wavData), 'QISRAudioWrite ret:', ret, 'epStatus:', epStatus.value, 'recogStatus:', recogStatus.value)
+        # 添加语音结束标识
+        ret = dll.QISRAudioWrite(sessionID, None, 0, MSP_AUDIO_SAMPLE_LAST, byref(epStatus), byref(recogStatus))
+        # print('len(wavData):', len(wavData), 'QISRAudioWrite ret:', ret, 'epStatus:', epStatus.value, 'recogStatus:', recogStatus.value)
+        # print("\n所有待识别音频已全部发送完毕\n获取的识别结果:")
 
-            # 添加语音结束标识
-            ret = dll.QISRAudioWrite(sessionID, None, 0, MSP_AUDIO_SAMPLE_LAST, byref(epStatus), byref(recogStatus))
-            # print('len(wavData):', len(wavData), 'QISRAudioWrite ret:', ret, 'epStatus:', epStatus.value, 'recogStatus:', recogStatus.value)
-
-            # print("\n所有待识别音频已全部发送完毕\n获取的识别结果:")
-
-            # 获取音频
-            laststr = ''
-            counter = 0
-            ret = c_int()
-            dll.QISRGetResult.restype = c_char_p
-            retstr = dll.QISRGetResult(sessionID, byref(recogStatus), 0, byref(ret))
-            if retstr is not None:
-                laststr += retstr.decode()
-                # print('###', laststr)
-
-            # while recogStatus.value != MSP_REC_STATUS_COMPLETE:    # 由于识别是语音片段分片识别的，需要循环直到识别完成
-            #     ret = c_int()
-            #     dll.QISRGetResult.restype = c_char_p
-            #     retstr = dll.QISRGetResult(sessionID, byref(recogStatus), 0, byref(ret))
-            #     if retstr is not None:
-            #         laststr += retstr.decode()
-            #         print('###',laststr)
-            #     # print('ret:', ret.value, 'recogStatus:', recogStatus.value)
-            #     counter += 1
-            #     time.sleep(0.2)
-            #     counter += 1
-            #     # if counter == 50:
-            #     #     laststr += '讯飞语音识别失败'
-            #     #     break
-            print(laststr)
+        # 获取音频
+        laststr = ''
+        counter = 0
+        ret = c_int()
+        dll.QISRGetResult.restype = c_char_p
+        retstr = dll.QISRGetResult(sessionID, byref(recogStatus), 0, byref(ret))
+        if retstr is not None:
+            laststr += retstr.decode()
+            # print('###', laststr)
+        print(laststr)
 
         # 不知道为什么注解了？
         #ret = dll.QISRSessionEnd(sessionID, '\0')
@@ -121,7 +101,7 @@ class Msp:
         # return laststr
 
 
-def XF_test(audio_rate):
+def XF_test(wavData, audio_rate):
     msp = Msp()
     #print("登录科大讯飞")
     msp.login()
@@ -129,7 +109,7 @@ def XF_test(audio_rate):
     session_begin_params = b"sub = iat, ptt = 0, result_encoding = utf8, result_type = plain, domain = iat"
     if 16000 == audio_rate:
         session_begin_params = b"sub = iat, domain = iat, language = zh_cn, accent = mandarin, sample_rate = 16000, result_type = plain, result_encoding = utf8"
-    msp.isr(session_begin_params)    # 该方法中循环采集语音，进行识别
+    msp.isr(wavData, session_begin_params)    # 该方法中循环采集语音，进行识别
 
 
 def main():
