@@ -1,9 +1,13 @@
 # -*- coding：utf-8 -*-
 
-
 from ctypes import *
 import time
 import win32com.client
+
+'''
+    IAT语音听写：输入为本地wav文件
+'''
+
 
 FRAME_LEN = 640  # Byte
 MSP_SUCCESS = 0
@@ -14,7 +18,7 @@ MSP_AUDIO_SAMPLE_LAST = 4
 MSP_REC_STATUS_COMPLETE = 5
 
 # 调用动态链接库
-dll = cdll.LoadLibrary("./windows_sdk/msc_x64.dll")
+dll = cdll.LoadLibrary("./windows_sdk/iat_sdk_x64.dll")
 # 登录参数，apppid一定要和你的下载SDK对应
 login_params = b"appid = 5d760a37, work_dir = ."
 
@@ -114,5 +118,5 @@ def XF_text(filepath, audio_rate):
     return text
 
 # 如果代码作为外置包被其他程序调用，请注释掉下两行；单独使用时保留
-path = "C:/Users/ASUS/Desktop/A11_152.wav"
-XF_text(path,16000)
+path = "./A11_152.wav"
+XF_text(path, 16000)

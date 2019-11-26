@@ -6,7 +6,11 @@ import time
 import pyaudio
 import win32com.client
 
-FRAME_LEN = 640  # Byte
+'''
+    IAT语音听写：输入为麦克风
+'''
+
+# FRAME_LEN = 640  # Byte
 MSP_SUCCESS = 0
 # 返回结果状态
 MSP_AUDIO_SAMPLE_FIRST = 1
@@ -15,7 +19,7 @@ MSP_AUDIO_SAMPLE_LAST = 4
 MSP_REC_STATUS_COMPLETE = 5
 
 # 调用动态链接库
-dll = cdll.LoadLibrary("./windows_sdk/msc_x64.dll")
+dll = cdll.LoadLibrary("./windows_sdk/iat_sdk_x64.dll")
 # 登录参数，apppid一定要和你的下载SDK对应
 login_params = b"appid = 5d760a37, work_dir = ."
 
@@ -61,47 +65,52 @@ class Msp:
         piceLne = 1638 * 2
         epStatus = c_int(0)
         recogStatus = c_int(0)
-
+        cnt = 0
         frameSize = 8000  # 每一帧的音频大小
         while True:
-            print(">")
-            wavData = stream.read(int(frameSize/4))
-            ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_FIRST, byref(epStatus),
-                                     byref(recogStatus))
+            cnt = cnt + 1
+            print(">", cnt)
+            wavData = stream.read(int(frameSize/2))
+
+            ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_FIRST, byref(epStatus), byref(recogStatus))
             # print('len(wavData):', len(wavData), '\nQISRAudioWrite ret:', ret,'\nepStatus:', epStatus.value, '\nrecogStatus:', recogStatus.value)
 
             time.sleep(0.1)
             if len(wavData) == 0:    # 如果没采集到语音，跳过继续采集
                 continue
-            ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_CONTINUE, byref(epStatus),
-                                     byref(recogStatus))
+            ret = dll.QISRAudioWrite(sessionID, wavData, len(wavData), MSP_AUDIO_SAMPLE_CONTINUE, byref(epStatus), byref(recogStatus))
             # print('len(wavData):', len(wavData), 'QISRAudioWrite ret:', ret, 'epStatus:', epStatus.value, 'recogStatus:', recogStatus.value)
 
             # 添加语音结束标识
-            # ret = dll.QISRAudioWrite(sessionID, None, 0, MSP_AUDIO_SAMPLE_LAST, byref(epStatus), byref(recogStatus))
+            ret = dll.QISRAudioWrite(sessionID, None, 0, MSP_AUDIO_SAMPLE_LAST, byref(epStatus), byref(recogStatus))
             # print('len(wavData):', len(wavData), 'QISRAudioWrite ret:', ret, 'epStatus:', epStatus.value, 'recogStatus:', recogStatus.value)
 
-            print("\n所有待识别音频已全部发送完毕\n获取的识别结果:")
+            # print("\n所有待识别音频已全部发送完毕\n获取的识别结果:")
 
-            # -- 获取音频
+            # 获取音频
             laststr = ''
             counter = 0
-            while recogStatus.value != MSP_REC_STATUS_COMPLETE:
-                ret = c_int()
-                dll.QISRGetResult.restype = c_char_p
-                retstr = dll.QISRGetResult(sessionID, byref(recogStatus), 0, byref(ret))
-                if retstr is not None:
-                    laststr += retstr.decode()
-                    print('333',laststr)
-                print('ret:', ret.value, 'recogStatus:', recogStatus.value)
-                counter += 1
-                time.sleep(0.2)
-                counter += 1
-                """
-              if counter == 50:
-                laststr += '讯飞语音识别失败'
-                break
-              """
+            ret = c_int()
+            dll.QISRGetResult.restype = c_char_p
+            retstr = dll.QISRGetResult(sessionID, byref(recogStatus), 0, byref(ret))
+            if retstr is not None:
+                laststr += retstr.decode()
+                # print('###', laststr)
+
+            # while recogStatus.value != MSP_REC_STATUS_COMPLETE:    # 由于识别是语音片段分片识别的，需要循环直到识别完成
+            #     ret = c_int()
+            #     dll.QISRGetResult.restype = c_char_p
+            #     retstr = dll.QISRGetResult(sessionID, byref(recogStatus), 0, byref(ret))
+            #     if retstr is not None:
+            #         laststr += retstr.decode()
+            #         print('###',laststr)
+            #     # print('ret:', ret.value, 'recogStatus:', recogStatus.value)
+            #     counter += 1
+            #     time.sleep(0.2)
+            #     counter += 1
+            #     # if counter == 50:
+            #     #     laststr += '讯飞语音识别失败'
+            #     #     break
             print(laststr)
 
         # 不知道为什么注解了？

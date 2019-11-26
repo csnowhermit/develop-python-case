@@ -216,9 +216,6 @@ def on_open(ws):
 
 
 
-
-
-
 if __name__ == "__main__":
     wsParam = Ws_Param(APPID='5d760a37',
                        APIKey='0881cf5a9cb3548c79e654b26f77b572',
