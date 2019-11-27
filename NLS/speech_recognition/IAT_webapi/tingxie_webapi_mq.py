@@ -25,7 +25,7 @@ from kafka import KafkaProducer
 import traceback
 from NLP.Logger import *
 
-log = Logger('../logs/tingxie_webapi_mq.log', level='error')
+log = Logger('../logs/tingxie_webapi_mq.log', level='info')
 
 broker_list = "192.168.117.101:9092,192.168.117.102:9092,192.168.117.103:9092"
 topic = "daotai"
@@ -109,6 +109,7 @@ def on_message(ws, message):
         if code != 0:
             errMsg = json.loads(message)["message"]
             print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
+            log.logger.warn("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
         else:
             data = json.loads(message)["data"]["result"]["ws"]
             # print(json.loads(message))
@@ -118,13 +119,16 @@ def on_message(ws, message):
                 for w in i["cw"]:
                     result += w["w"]
             print("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
+            log.logger.info("sid:%s call success!,data is:%s" % (sid, json.dumps(data, ensure_ascii=False)))
             print(time.time() - time11)
+            log.logger.info(time.time() - time11)
             json_obj = json.dumps(data, ensure_ascii=False)
             json_obj = json.loads(json_obj)
             text = ""
             for obj in json_obj:
                 text = text + obj["cw"][0]["w"]
             print("识别结果：", text)
+            log.logger.info("识别结果：%s" % text)
             producer.send(topic=topic, value=bytes(str(text).encode('utf-8')))     # 写入kafka，等待消费端（语义识别端）拉取
     except Exception as e:
         print("receive msg,but parse exception:", e)
