@@ -1,0 +1,15 @@
+2019-11-27 14:44:01,077 - D:/workspace/Pycharm_Projects/develop-python-case/NLS/speech_recognition/IAT_webapi/tingxie_webapi_mq.py[line:197] - ERROR: websocket._exceptions.WebSocketConnectionClosedException: Traceback (most recent call last):
+  File "D:/workspace/Pycharm_Projects/develop-python-case/NLS/speech_recognition/IAT_webapi/tingxie_webapi_mq.py", line 187, in run
+    ws.send(json.dumps(d))
+  File "D:\Anaconda3\lib\site-packages\websocket_client-0.56.0-py3.6.egg\websocket\_app.py", line 153, in send
+    if not self.sock or self.sock.send(data, opcode) == 0:
+  File "D:\Anaconda3\lib\site-packages\websocket_client-0.56.0-py3.6.egg\websocket\_core.py", line 253, in send
+    return self.send_frame(frame)
+  File "D:\Anaconda3\lib\site-packages\websocket_client-0.56.0-py3.6.egg\websocket\_core.py", line 278, in send_frame
+    l = self._send(data)
+  File "D:\Anaconda3\lib\site-packages\websocket_client-0.56.0-py3.6.egg\websocket\_core.py", line 448, in _send
+    return send(self.sock, data)
+  File "D:\Anaconda3\lib\site-packages\websocket_client-0.56.0-py3.6.egg\websocket\_socket.py", line 135, in send
+    raise WebSocketConnectionClosedException("socket is already closed.")
+websocket._exceptions.WebSocketConnectionClosedException: socket is already closed.
+

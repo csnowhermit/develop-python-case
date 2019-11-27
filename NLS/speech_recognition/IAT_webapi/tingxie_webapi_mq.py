@@ -22,6 +22,10 @@ import _thread as thread
 import demjson
 import pyaudio
 from kafka import KafkaProducer
+import traceback
+from NLP.Logger import *
+
+log = Logger('../logs/tingxie_webapi_mq.log', level='error')
 
 broker_list = "192.168.117.101:9092,192.168.117.102:9092,192.168.117.103:9092"
 topic = "daotai"
@@ -105,7 +109,6 @@ def on_message(ws, message):
         if code != 0:
             errMsg = json.loads(message)["message"]
             print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
-
         else:
             data = json.loads(message)["data"]["result"]["ws"]
             # print(json.loads(message))
@@ -125,6 +128,7 @@ def on_message(ws, message):
             producer.send(topic=topic, value=bytes(str(text).encode('utf-8')))     # 写入kafka，等待消费端（语义识别端）拉取
     except Exception as e:
         print("receive msg,but parse exception:", e)
+        log.logger.error("receive msg,but parse exception: %s" % traceback.format_exc())
 
 
 
@@ -136,31 +140,13 @@ def on_error(ws, error):
 # 收到websocket关闭的处理
 def on_close(ws):
     print("### closed ###")
-    while True:
-        time.sleep(0.2)
-        print(">")
-        wsUrl = wsParam.create_url()
-        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-        ws.on_open = on_open
-        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-        print("### 已重连 ###")
-        # ss = input("是否自动重连？（y/N）")
-        # if ss == str("y"):
-        #     # 连接因超时断开后自动重连
-        #     print(">")
-        #     wsUrl = wsParam.create_url()
-        #     ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-        #     ws.on_open = on_open
-        #     ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-        #     print("### 已重连 ###")
-        #     break
-        # elif ss == str("N"):
-        #     print("不重连")
-        #     break
-        # else:
-        #     continue
-
-
+    time.sleep(0.2)
+    print(">")
+    wsUrl = wsParam.create_url()
+    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+    ws.on_open = on_open
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    print("### 已重连 ###")
 
 
 # 收到websocket连接建立的处理
@@ -175,38 +161,44 @@ def on_open(ws):
 
         while True:
             buf = stream.read(int(frameSize/4))
-
             # print(type(buf), len(buf), index)
-            # 文件结束
-            if not buf:
-                status = STATUS_LAST_FRAME
-            # 第一帧处理
-            # 发送第一帧音频，带business 参数
-            # appid 必须带上，只需第一帧发送
-            if status == STATUS_FIRST_FRAME:
 
-                d = {"common": wsParam.CommonArgs,
-                     "business": wsParam.BusinessArgs,
-                     "data": {"status": 0, "format": "audio/L16;rate=16000",
-                              "audio": str(base64.b64encode(buf), 'utf-8'),
-                              "encoding": "raw"}}
-                d = json.dumps(d)
-                ws.send(d)
-                status = STATUS_CONTINUE_FRAME
-            # 中间帧处理
-            elif status == STATUS_CONTINUE_FRAME:
-                d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
-                              "audio": str(base64.b64encode(buf), 'utf-8'),
-                              "encoding": "raw"}}
-                ws.send(json.dumps(d))
-            # 最后一帧处理
-            elif status == STATUS_LAST_FRAME:
-                d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
-                              "audio": str(base64.b64encode(buf), 'utf-8'),
-                              "encoding": "raw"}}
-                ws.send(json.dumps(d))
-                time.sleep(1)
-                break
+            try:
+                # 文件结束
+                if not buf:
+                    status = STATUS_LAST_FRAME
+                # 第一帧处理
+                # 发送第一帧音频，带business 参数
+                # appid 必须带上，只需第一帧发送
+                if status == STATUS_FIRST_FRAME:
+                    d = {"common": wsParam.CommonArgs,
+                         "business": wsParam.BusinessArgs,
+                         "data": {"status": 0, "format": "audio/L16;rate=16000",
+                                  "audio": str(base64.b64encode(buf), 'utf-8'),
+                                  "encoding": "raw"}}
+                    d = json.dumps(d)
+                    ws.send(d)
+                    status = STATUS_CONTINUE_FRAME
+                # 中间帧处理
+                elif status == STATUS_CONTINUE_FRAME:
+                    d = {"data": {"status": 1, "format": "audio/L16;rate=16000",
+                                  "audio": str(base64.b64encode(buf), 'utf-8'),
+                                  "encoding": "raw"}}
+                    ws.send(json.dumps(d))
+                # 最后一帧处理
+                elif status == STATUS_LAST_FRAME:
+                    d = {"data": {"status": 2, "format": "audio/L16;rate=16000",
+                                  "audio": str(base64.b64encode(buf), 'utf-8'),
+                                  "encoding": "raw"}}
+                    ws.send(json.dumps(d))
+                    time.sleep(1)
+                    break
+            except websocket._exceptions.WebSocketConnectionClosedException as e:    # 如果断开了，打log
+                log.logger.error("websocket._exceptions.WebSocketConnectionClosedException: %s" % traceback.format_exc())
+                break    # 打log后退出循环，等待自动重连
+            except Exception as e:    # 其他异常
+                log.logger.error("Exception: %s" % traceback.format_exc())
+
             # 模拟音频采样间隔
             time.sleep(intervel)
             index = index + 1
@@ -221,6 +213,7 @@ if __name__ == "__main__":
                        APIKey='0881cf5a9cb3548c79e654b26f77b572',
                        APISecret='c340e2627a9c1697c117769dbdbb12d5')
     websocket.enableTrace(False)
+    print(">")
     wsUrl = wsParam.create_url()
     ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
     ws.on_open = on_open
