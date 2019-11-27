@@ -19,4 +19,4 @@ derby.log
 nb-configuration.xml
 .DS_Store
 *__pycache__*
-./NLS/speech_recognition/logs/*
+NLS/speech_recognition/logs/
