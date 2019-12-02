@@ -100,9 +100,9 @@ def getAllKeywords(zhuhai_c, others):
             arr = line.strip().split("\t")
             for k in arr[0].strip().split(","):
                 if k in zhuhai_c:
-                    keywords.append("地名1")
+                    keywords.append("地名1")    # 一层候车的为“地名1”
                 elif k in others:
-                    keywords.append("地名2")
+                    keywords.append("地名2")    # 三层候车的为“地名2”
                 else:
                     keywords.append(k)
     return set(keywords)
@@ -118,12 +118,12 @@ def get_words(line):
     s = ""
     arr = jieba.cut(line)
     for a in arr:
-        if a in zhuhai_c:    # Entity实体（地名）的泛化
-            # a = "地名1"
-            a = "地名"
-        elif a in others:    # Entity实体（地名）的泛化
-            # a = "地名2"
-            a = "地名"
+        if a in zhuhai_c:    # Entity实体（地名）的泛化，坐城轨
+            a = "地名1"
+            # a = "地名"
+        elif a in others:    # Entity实体（地名）的泛化，坐车（坐高铁）
+            a = "地名2"
+            # a = "地名"
         elif a in keywords:    # 其他关键字原样识别
             a = a
         else:
