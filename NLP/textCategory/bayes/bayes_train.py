@@ -283,7 +283,7 @@ def trainMultinamialNB(num):
     多轮训练模型：训练伯努利分类器，找最优的参数组合，并保存至模型文件
     :param num：训练轮数，从多少轮中找最优
 '''
-def trainBinarize(num):
+def trainBinarize(num_alpha, num_binarize):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
     train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
@@ -293,15 +293,15 @@ def trainBinarize(num):
     train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []  # 保存每轮训练的参数及准确率
-    alpha_increase_rate = float(1 / num)
-    binarize_increase_rate = float(1 / num)
+    alpha_increase_rate = float(1 / num_alpha)
+    binarize_increase_rate = float(1 / num_binarize)
 
     # 3.伯努利分类器，不考虑特征1/0的分界线
     alpha = 0.0  # 平滑度
     binarize = None
     fit_prior = True  # 考虑先验概率
     class_prior = None  # 不手动指定每个类别的先验概率
-    for i in range(num):
+    for i in range(num_alpha):
         print(alpha, end=',')
         right_rate = bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior, persist=False)
         result.append((alpha, binarize, right_rate))
@@ -312,8 +312,8 @@ def trainBinarize(num):
     binarize=0.0   # 特征1/0的分界线
     fit_prior = True  # 考虑先验概率
     class_prior = None  # 不手动指定每个类别的先验概率
-    for i in range(num):
-        for j in range(num):
+    for i in range(num_alpha):
+        for j in range(num_binarize):
             print(alpha, binarize, end=',')
             right_rate = bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit_prior, class_prior, persist=False)
             result.append((alpha, binarize, right_rate))
@@ -349,10 +349,10 @@ def main():
     # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     # 3.多轮训练多项式分类器
-    trainMultinamialNB(100)
+    trainMultinamialNB(1000)
 
     # 4.多轮训练伯努利分类器
-    trainBinarize(100)
+    trainBinarize(1000, 100)
 
 
 if __name__ == '__main__':
