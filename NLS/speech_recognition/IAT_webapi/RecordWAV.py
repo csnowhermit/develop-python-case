@@ -19,7 +19,7 @@ def loop_recording(filepath):
     FORMAT = pyaudio.paInt16
     CHANNELS = 1  # 声道数
     RATE = 16000  # 采样率
-    RECORD_SECONDS = 60
+    RECORD_SECONDS = 60    # 录制时间：60s
     WAVE_OUTPUT_FILENAME = filepath
     p = pyaudio.PyAudio()
 
@@ -43,7 +43,7 @@ def loop_recording(filepath):
         data = stream.read(CHUNK)
         frames.append(data)    # 原本为一个文件写一次，现在改为动一下写一次
         # print(type(frames), frames)
-        print(type(data), data)
+        # print(type(data), data)
         wf.writeframes(b''.join(frames))
         frames = []    # 写完一批清空后再写下一批
     print("*" * 10, "录音结束\n")
