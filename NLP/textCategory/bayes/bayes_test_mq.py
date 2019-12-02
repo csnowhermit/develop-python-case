@@ -59,7 +59,7 @@ def test_bayes(model_file):
                             left = "坐高铁"
                         print(left, "-->", word_list)
                 else:
-                    print("闲聊", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
+                    print("咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
         time.sleep(0.5)    # 隔0.5s再次拉取
 
 
