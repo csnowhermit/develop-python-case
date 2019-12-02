@@ -5,6 +5,7 @@ import time
 from sklearn.externals import joblib
 from NLP.textCategory.bayes.bayes_train import get_dataset, get_words, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path, isChat
 from kafka import KafkaConsumer
+from NLP.Logger import *
 
 '''
     从文件读取模型并进行分类，从消息队列读取数据
@@ -12,6 +13,8 @@ from kafka import KafkaConsumer
 
 bootstrap_server = "192.168.117.101:9092,192.168.117.102:9092,192.168.117.103:9092"
 topic = "daotai"
+
+log = Logger('D:/data/bayes_mq.log', level='info')
 
 consumer = KafkaConsumer(topic, auto_offset_reset='latest', bootstrap_servers=bootstrap_server)
 # print(consumer)
@@ -57,9 +60,11 @@ def test_bayes(model_file):
                     for left in predict:
                         if left == "坐车":
                             left = "坐高铁"
-                        print(left, "-->", word_list)
+                        print(left, "-->", word_list, "-->", sentences)
+                        log.logger.info((left, "-->", word_list, "-->", sentences))
                 else:
                     print("咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
+                    log.logger.info(("咨询类", "-->", sentences))
         time.sleep(0.5)    # 隔0.5s再次拉取
 
 
