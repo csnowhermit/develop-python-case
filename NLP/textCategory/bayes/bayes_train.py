@@ -102,7 +102,7 @@ def getAllKeywords(zhuhai_c, others):
                 if k in zhuhai_c:
                     keywords.append("地名1")    # 一层候车的为“地名1”
                 elif k in others:
-                    keywords.append("地名2")    # 三层候车的为“地名2”
+                    keywords.append("地名3")    # 三层候车的为“地名3”
                 else:
                     keywords.append(k)
     return set(keywords)
@@ -122,7 +122,7 @@ def get_words(line):
             a = "地名1"
             # a = "地名"
         elif a in others:    # Entity实体（地名）的泛化，坐车（坐高铁）
-            a = "地名2"
+            a = "地名3"
             # a = "地名"
         elif a in keywords:    # 其他关键字原样识别
             a = a
@@ -203,7 +203,7 @@ def multinamialNB(train_set, train_label, test_set, test_label, alpha, fit_prior
         joblib.dump(nbc, multinamialNB_save_path + "multinamialNB_" +
                     str(int(time.time())) + "_" +
                     str(right_rate)[str(right_rate).index(".") + 1: ] + "_" +
-                    str(alpha) + ".m")
+                    str(alpha)[str(alpha).index(".") + 1: ] + ".m")
     return right_rate
 
 '''
@@ -239,11 +239,18 @@ def bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit
     print("bernousNB:", count / len(test_label))
 
     if persist is True:
-        joblib.dump(nbc_1, bernousNB_save_path + "bernousNB_" +
-                    str(int(time.time())) + "_" +
-                    str(right_rate)[str(right_rate).index(".") + 1:] + "_" +
-                    str(alpha) + "_" +
-                    str(binarize) + ".m")
+        if binarize is None:
+            joblib.dump(nbc_1, bernousNB_save_path + "bernousNB_" +
+                        str(int(time.time())) + "_" +
+                        str(right_rate)[str(right_rate).index(".") + 1:] + "_" +
+                        str(alpha)[str(alpha).index(".") + 1:] + "_" +
+                        str(binarize) + ".m")
+        else:
+            joblib.dump(nbc_1, bernousNB_save_path + "bernousNB_" +
+                        str(int(time.time())) + "_" +
+                        str(right_rate)[str(right_rate).index(".") + 1:] + "_" +
+                        str(alpha)[str(alpha).index(".") + 1:] + "_" +
+                        str(binarize)[str(binarize).index(".") + 1:] + ".m")
     return right_rate
 
 '''
