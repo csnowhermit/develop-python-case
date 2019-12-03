@@ -27,6 +27,7 @@ keywords_intention_file = "../keywords_intention.txt"      # 整理后的关键�
 stopwords_file = "../stopwords.txt"            # 停用词
 zhuhai_station_file = "../zhuhai.txt"          # 珠海方向车站
 others_station_file = "../others.txt"          # 其他方向车站
+destBus_station_file = "../destBus.txt"        # 坐大巴能到的目的地
 
 multinamialNB_save_path = "./model/multinamialNB/"    # 多项式分类器模型保存路径
 bernousNB_save_path = "./model/bernousNB/"            # 伯努利分类器模型保存路径
@@ -88,6 +89,8 @@ def getWordList(filepath):
 
 zhuhai_c = getWordList(zhuhai_station_file)
 others = getWordList(others_station_file)
+# destBus = getWordList(destBus_station_file)
+destBus = []
 
 '''
     获取“关键字-意图”文件中所有关键字
@@ -103,6 +106,8 @@ def getAllKeywords(zhuhai_c, others):
                     keywords.append("地名1")    # 一层候车的为“地名1”
                 elif k in others:
                     keywords.append("地名3")    # 三层候车的为“地名3”
+                elif k in destBus:
+                    keywords.append("地名4")    # 坐大巴到的目的地，only
                 else:
                     keywords.append(k)
     return set(keywords)
@@ -120,10 +125,10 @@ def get_words(line):
     for a in arr:
         if a in zhuhai_c:    # Entity实体（地名）的泛化，坐城轨
             a = "地名1"
-            # a = "地名"
         elif a in others:    # Entity实体（地名）的泛化，坐车（坐高铁）
             a = "地名3"
-            # a = "地名"
+        elif a in destBus:   # Entity实体（地名）的泛化，坐大巴
+            a = "地名4"
         elif a in keywords:    # 其他关键字原样识别
             a = a
         else:
