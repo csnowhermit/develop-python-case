@@ -15,7 +15,7 @@ def get_audio2(filepath):
     FORMAT = pyaudio.paInt16
     CHANNELS = 1  # 声道数
     RATE = 16000  # 采样率
-    RECORD_SECONDS = 10
+    RECORD_SECONDS = 20
     WAVE_OUTPUT_FILENAME = filepath
     p = pyaudio.PyAudio()
 
@@ -55,7 +55,7 @@ def loop_recording(filepath):
     FORMAT = pyaudio.paInt16
     CHANNELS = 1  # 声道数
     RATE = 16000  # 采样率
-    RECORD_SECONDS = 3
+    RECORD_SECONDS = 10
     WAVE_OUTPUT_FILENAME = filepath
     p = pyaudio.PyAudio()
 
@@ -96,11 +96,11 @@ def wav2pcm(wav_file, to_pcm):
 
 
 if __name__ == '__main__':
-    dir_paths = ['D:/data/rtasr/']
-    to_pcm = "D:/data/loop_recording.pcm"
+    dir_paths = ['D:/data/iat/']
+    # to_pcm = "D:/data/loop_recording.pcm"
 
     while True:
         inputfile = dir_paths[0] + str(time.time()).replace('.', '') + ".wav"
         print(inputfile)
         loop_recording(inputfile)    # 录音
-        wav2pcm(inputfile, to_pcm)       # 转pcm文件
+        # wav2pcm(inputfile, to_pcm)       # 转pcm文件
