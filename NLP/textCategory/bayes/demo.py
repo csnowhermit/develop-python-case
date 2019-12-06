@@ -1,5 +1,6 @@
 # -*- coding:utf-8 -*-
 
+import os
 import jieba
 import jieba.posseg as pesg
 from NLP.textCategory.bayes.bayes_train import keywords, keywords_intention_file
@@ -13,5 +14,10 @@ from NLP.textCategory.bayes.bayes_train import keywords, keywords_intention_file
 #             print(w.flag, end=" ")
 #         print()
 
-print(keywords_intention_file)
-print(keywords)
+# print(keywords_intention_file)
+# print(keywords)
+
+dirname = "D:/data/南站现场/广南一层中间12306录wav20191030/"
+for file in os.listdir(dirname):
+    if file.endswith(".old"):
+        os.rename(dirname + file, dirname + file[0: -4])

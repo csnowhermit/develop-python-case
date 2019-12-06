@@ -105,7 +105,7 @@ def getAllKeywords(zhuhai_c, others):
                 if k in zhuhai_c:
                     keywords.append("地名1")    # 一层候车的为“地名1”
                 elif k in others:
-                    keywords.append("地名3")    # 三层候车的为“地名3”
+                    keywords.append("地名")    # 三层候车的为“地名”
                 elif k in destBus:
                     keywords.append("地名4")    # 坐大巴到的目的地，only
                 else:
@@ -126,7 +126,7 @@ def get_words(line):
         if a in zhuhai_c:    # Entity实体（地名）的泛化，坐城轨
             a = "地名1"
         elif a in others:    # Entity实体（地名）的泛化，坐车（坐高铁）
-            a = "地名3"
+            a = "地名"
         elif a in destBus:   # Entity实体（地名）的泛化，坐大巴
             a = "地名4"
         elif a in keywords:    # 其他关键字原样识别
