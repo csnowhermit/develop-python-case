@@ -23,17 +23,28 @@ from NLP.textCategory.bayes.bayes_train import keywords, keywords_intention_file
 #         os.rename(dirname + file, dirname + file[0: -4])
 
 
-for i in range(1, 15):
-    print("南", i, "桥柱\t找南" ,i, "桥柱")
-    print("南", i, "桥\t找南" ,i, "桥柱")
-    print("南", i, "柱\t找南" ,i, "桥柱")
-    print("南", i, "桥墩\t找南" ,i, "桥柱")
-    print("南", i, "桥洞\t找南" ,i, "桥柱")
-    print("南", i, "洞口\t找南" ,i, "桥柱")
+# for i in range(1, 15):
+#     print("南", i, "桥柱\t找南" ,i, "桥柱")
+#     print("南", i, "桥\t找南" ,i, "桥柱")
+#     print("南", i, "柱\t找南" ,i, "桥柱")
+#     print("南", i, "桥墩\t找南" ,i, "桥柱")
+#     print("南", i, "桥洞\t找南" ,i, "桥柱")
+#     print("南", i, "洞口\t找南" ,i, "桥柱")
 
 list = []
 with open("../atomic.txt", encoding="utf-8") as fo:
     for line in fo.readlines():
         list.append(line.strip())
-
 print(len(set(list)))
+
+# for i in range(1, 29):
+#     # print("到达口", i, "\t找", i, "号到达口")
+#     # print("出口", i, "\t找", i, "号到达口")
+#     # print(i, "号到达口\t找", i, "号到达口")
+#     # print(i, "号出口\t找", i, "号到达口")
+#     # print(i, "号口\t找", i, "号到达口")
+#     print("到达口", i)
+#     print("出口", i)
+#     print(i, "号到达口")
+#     print(i, "号出口")
+#     print(i, "号口")

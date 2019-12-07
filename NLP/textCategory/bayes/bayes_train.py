@@ -15,15 +15,13 @@ from sklearn.naive_bayes import BaseDiscreteNB    # BaseDiscreteNB为抽象类�
 '''
     贝叶斯：文本分类
     模型文件命名规范：
-    多项式分类器：multinamialNB_时间戳_准确率_alpha参数值.m。
-        例：multinamialNB_1574678941_8475336322869955_0.03.m，1574499534时间，alpha=0.03时，准确率为0.8475336322869955。
-    伯努利分类器：bernousNB_时间戳_准确率_alpha参数值_binarize参数值.m。
-        例：bernousNB_1574680872_8430493273542601_0.02_None.m，1574499534时间，alpha=0.02，binarize=None时，准确率为0.8430493273542601。
+        多项式分类器：multinamialNB_时间戳_准确率_alpha参数值.m。
+        伯努利分类器：bernousNB_时间戳_准确率_alpha参数值_binarize参数值.m。
 '''
 
 atomic_file = "../atomic.txt"                   # 不可切分词
 origin_sentences_file = "../原始例句.txt"       # 原始例句
-keywords_intention_file = "../keywords_intention.txt"      # 整理后的关键字-意图
+keywords_intention_file = "../keywords_intention_all.txt"      # 整理后的关键字-意图
 stopwords_file = "../stopwords.txt"            # 停用词
 zhuhai_station_file = "../zhuhai.txt"          # 珠海方向车站
 others_station_file = "../others.txt"          # 其他方向车站
@@ -265,11 +263,11 @@ def bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit
 def trainMultinamialNB(num):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
-    train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
+    train_set, train_label, test_set, test_label = split_train_and_test_set(org_data, 0.7)
 
-    # 2.加载原始数据，现场切词，作为测试数据集
-    test_data = get_dataset()
-    train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
+    # # 2.加载原始数据，现场切词，作为测试数据集
+    # test_data = get_dataset()
+    # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []    # 保存每轮训练的参数及准确率
     alpha_increase_rate = float(1 / num)
@@ -298,11 +296,11 @@ def trainMultinamialNB(num):
 def trainBinarize(num_alpha, num_binarize):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
-    train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
+    train_set, train_label, test_set, test_label = split_train_and_test_set(org_data, 0.7)
 
-    # 2.加载原始数据，现场切词，作为测试数据集
-    test_data = get_dataset()
-    train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
+    # # 2.加载原始数据，现场切词，作为测试数据集
+    # test_data = get_dataset()
+    # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []  # 保存每轮训练的参数及准确率
     alpha_increase_rate = float(1 / num_alpha)
@@ -361,10 +359,10 @@ def main():
     # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     # 3.多轮训练多项式分类器
-    trainMultinamialNB(1000)
+    trainMultinamialNB(100)
 
     # 4.多轮训练伯努利分类器
-    trainBinarize(1000, 100)
+    trainBinarize(100, 10)
 
 
 if __name__ == '__main__':

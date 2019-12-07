@@ -2,14 +2,17 @@
 
 import os
 from sklearn.externals import joblib
-from NLP.textCategory.bayes.bayes_train import get_dataset, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path
+from NLP.textCategory.bayes.bayes_train import load_dataset, get_dataset, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path
 
 '''
     从文件读取模型并进行分类
 '''
 
-test_data = get_dataset()
+test_data = get_dataset()    # 从文本中测试
 train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
+
+# test_data = load_dataset()     # 从测试集中测试
+# train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.7)
 
 '''
     分离出来
@@ -53,7 +56,7 @@ def test_bayes(model_file):
 
 
 def main():
-    test_bayes(get_newest_model(multinamialNB_save_path))
+    # test_bayes(get_newest_model(multinamialNB_save_path))
     test_bayes(get_newest_model(bernousNB_save_path))
     # print(get_newest_model(multinamialNB_save_path))
     # print(get_newest_model(bernousNB_save_path))
