@@ -3,7 +3,7 @@
 import random
 
 '''
-    扩展特征集
+    扩展特征集，调用此脚本生成./keywords_intention_all.txt文件
 '''
 
 data = []

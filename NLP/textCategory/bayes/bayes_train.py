@@ -9,7 +9,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.feature_extraction.text import TfidfVectorizer, HashingVectorizer, CountVectorizer
 from sklearn.naive_bayes import BernoulliNB
 from sklearn.externals import joblib
-from sklearn.naive_bayes import GaussianNB        # 高斯贝叶斯分类器
+from sklearn.naive_bayes import GaussianNB        # 高斯贝叶斯分类器，不能用：高斯要求训练数据为数值型，而该场景为标称型
 from sklearn.naive_bayes import BaseDiscreteNB    # BaseDiscreteNB为抽象类，不能直接进行实例化，应该用基于该抽象类的MultinomialNB和BernoulliNB
 
 '''
@@ -21,7 +21,7 @@ from sklearn.naive_bayes import BaseDiscreteNB    # BaseDiscreteNB为抽象类�
 
 atomic_file = "../atomic.txt"                   # 不可切分词
 origin_sentences_file = "../原始例句.txt"       # 原始例句
-keywords_intention_file = "../keywords_intention_all.txt"      # 整理后的关键字-意图
+keywords_intention_file = "../keywords_intention.txt"      # 整理后的关键字-意图
 stopwords_file = "../stopwords.txt"            # 停用词
 zhuhai_station_file = "../zhuhai.txt"          # 珠海方向车站
 others_station_file = "../others.txt"          # 其他方向车站
@@ -263,11 +263,11 @@ def bernousNB(train_set, train_label, test_set, test_label, alpha, binarize, fit
 def trainMultinamialNB(num):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
-    train_set, train_label, test_set, test_label = split_train_and_test_set(org_data, 0.7)
+    train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
 
-    # # 2.加载原始数据，现场切词，作为测试数据集
-    # test_data = get_dataset()
-    # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
+    # 2.加载原始数据，现场切词，作为测试数据集
+    test_data = get_dataset()
+    train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []    # 保存每轮训练的参数及准确率
     alpha_increase_rate = float(1 / num)
@@ -296,11 +296,11 @@ def trainMultinamialNB(num):
 def trainBinarize(num_alpha, num_binarize):
     # 1.加载准备好的关键词及意图，作为训练数据集
     org_data = load_dataset()
-    train_set, train_label, test_set, test_label = split_train_and_test_set(org_data, 0.7)
+    train_set, train_label, test_set_tmp, test_label_tmp = split_train_and_test_set(org_data, 1.0)
 
-    # # 2.加载原始数据，现场切词，作为测试数据集
-    # test_data = get_dataset()
-    # train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
+    # 2.加载原始数据，现场切词，作为测试数据集
+    test_data = get_dataset()
+    train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
 
     result = []  # 保存每轮训练的参数及准确率
     alpha_increase_rate = float(1 / num_alpha)
