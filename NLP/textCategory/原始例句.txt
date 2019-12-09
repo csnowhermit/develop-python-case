@@ -368,3 +368,6 @@ p1停车场怎么过去	找p1停车场
 问一下那个取票口在哪	找自助取票机
 取票的机子在哪里啊	找自助取票机
 我重新取票再进站	找自助取票机
+where is subway	坐地铁
+how can I walk to the metro	坐地铁
+where is coffee	找咖啡店
