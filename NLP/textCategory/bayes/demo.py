@@ -32,7 +32,7 @@ from NLP.textCategory.bayes.bayes_train import keywords, keywords_intention_file
 #     print("南", i, "洞口\t找南" ,i, "桥柱")
 
 list = []
-with open("../atomic.txt", encoding="utf-8") as fo:
+with open("../kdata/atomic.txt", encoding="utf-8") as fo:
     for line in fo.readlines():
         list.append(line.strip())
 print(len(set(list)))

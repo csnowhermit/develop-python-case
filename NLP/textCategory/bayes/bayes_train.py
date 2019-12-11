@@ -19,13 +19,13 @@ from sklearn.naive_bayes import BaseDiscreteNB    # BaseDiscreteNB为抽象类�
         伯努利分类器：bernousNB_时间戳_准确率_alpha参数值_binarize参数值.m。
 '''
 
-atomic_file = "../atomic.txt"                   # 不可切分词
-origin_sentences_file = "../原始例句.txt"       # 原始例句
-keywords_intention_file = "../keywords_intention.txt"      # 整理后的关键字-意图
-stopwords_file = "../stopwords.txt"            # 停用词
-zhuhai_station_file = "../zhuhai.txt"          # 珠海方向车站
-others_station_file = "../others.txt"          # 其他方向车站
-destBus_station_file = "../destBus.txt"        # 坐大巴能到的目的地
+atomic_file = "../kdata/atomic.txt"                   # 不可切分词
+origin_sentences_file = "../kdata/原始例句.txt"       # 原始例句
+keywords_intention_file = "../kdata/keywords_intention.txt"      # 整理后的关键字-意图
+stopwords_file = "../kdata/stopwords.txt"            # 停用词
+zhuhai_station_file = "../kdata/zhuhai.txt"          # 珠海方向车站
+others_station_file = "../kdata/others.txt"          # 其他方向车站
+destBus_station_file = "../kdata/destBus.txt"        # 坐大巴能到的目的地
 
 multinamialNB_save_path = "./model/multinamialNB/"    # 多项式分类器模型保存路径
 bernousNB_save_path = "./model/bernousNB/"            # 伯努利分类器模型保存路径

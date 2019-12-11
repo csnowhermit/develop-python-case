@@ -7,7 +7,7 @@ import random
 '''
 
 data = []
-with open("./keywords_intention.txt", encoding="utf-8", errors="ignore") as fo:
+with open("../kdata/keywords_intention.txt", encoding="utf-8", errors="ignore") as fo:
     for line in fo.readlines():
         data.append(line.strip())
 random.shuffle(data)    # 随机打乱
@@ -22,7 +22,7 @@ for d in data:
         new_data.append(d)
 random.shuffle(new_data)
 
-with open("./keywords_intention_all.txt", encoding="utf-8", errors="ignore", mode="w+") as fo:
+with open("../kdata/keywords_intention_all.txt", encoding="utf-8", errors="ignore", mode="w+") as fo:
     for d in new_data:
         fo.writelines(d + "\n")
 
