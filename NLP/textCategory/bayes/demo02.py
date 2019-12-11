@@ -2,21 +2,12 @@
 
 from NLP.textCategory.bayes.bayes_train import *
 
-print(len(keywords))
-print(keywords)
-print(len(set(keywords)))
-
-atoList = []
-with open("../atomic.txt", encoding="utf-8") as fo:
+yuyi = []
+with open(keywords_intention_file, encoding="utf-8") as fo:
     for line in fo.readlines():
-        atoList.append(line.strip())
+        arr = line.strip().split("\t")
+        yuyi.append(arr[1])
 
-
-print(len(atoList))
-print(atoList)
-
-for a in atoList:
-    if a not in keywords:
-        print(a)
-print("==")
-
+print(len(yuyi))
+print(len(set(yuyi)))
+print(set(yuyi))
