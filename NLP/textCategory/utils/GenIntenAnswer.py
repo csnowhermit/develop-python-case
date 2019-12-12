@@ -16,6 +16,7 @@ import redis
 r = redis.Redis(host="192.168.117.134", port=6379, password="123456")
 cache_key = "IntenAnswer"
 yuyiList = []
+default_result = "不好意思，我不理解您说的呢"
 
 '''
     缓存“语义-回答”
@@ -41,7 +42,7 @@ def getAssignAnswer(field):
         result_List = result.split("|")
         return result.split("|")[random.randint(0, len(result_List) - 1)]
     except:
-        return "不好意思，我不理解您说的呢"
+        return default_result
 
 
 def main():
