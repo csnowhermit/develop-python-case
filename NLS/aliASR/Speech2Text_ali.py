@@ -44,7 +44,7 @@ class MyCallback(SpeechRecognizerCallback):
         print('MyCallback.OnRecognitionChannelClosed')
 
 def process(client, appkey, token):
-    audio_name = 'D:/workspace/IDEA_Projects/nls-sdk-java-demo/nls-sample-16k.wav'
+    audio_name = '../waveFeature/nls-sample-16k.wav'
     callback = MyCallback(audio_name)
     recognizer = client.create_recognizer(callback)
     recognizer.set_appkey(appkey)

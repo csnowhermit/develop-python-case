@@ -1,6 +1,6 @@
 import wave
 import numpy as np
-from scipy.fftpack import fft
+from scipy.fftpack import fft   # fft，快速傅立叶变换
 
 '''
     根据wav文件，做成输入特征矩阵

@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from NLP.textCategory.bayes.bayes_train import keywords, atomic_file
-from NLP.textCategory.utils.genAllStations import genStationList
+from NLP.textCategory.utils.GenAllStations import genStationList
 
 '''
     自动生成atomic.txt，切词时确保指定词不切开
