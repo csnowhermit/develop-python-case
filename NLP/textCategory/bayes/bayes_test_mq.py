@@ -6,6 +6,7 @@ from sklearn.externals import joblib
 from NLP.textCategory.bayes.bayes_train import get_dataset, get_words, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path, isChat
 from kafka import KafkaConsumer
 from NLP.Logger import *
+from NLP.textCategory.utils.GenIntenAnswer import cache_key, getAssignAnswer
 
 '''
     从文件读取模型并进行分类，从消息队列读取数据
@@ -16,7 +17,9 @@ topic = "daotai"
 
 log = Logger('D:/data/bayes_mq.log', level='info')
 
-consumer = KafkaConsumer(topic, auto_offset_reset='latest', bootstrap_servers=bootstrap_server)
+# auto_offset_reset='latest'，最多消费一次
+# auto_offset_reset='earliest'，最少消费一次
+consumer = KafkaConsumer(topic, auto_offset_reset='earliest', bootstrap_servers=bootstrap_server)
 # print(consumer)
 
 # test_data = get_dataset()
@@ -46,7 +49,7 @@ def get_newest_model(model_path):
 def test_bayes(model_file):
     clf = joblib.load(model_file)
     while True:
-        msg = consumer.poll(timeout_ms=1000, max_records=3)  # 每次拉取
+        msg = consumer.poll(timeout_ms=1000, max_records=10)  # 每次拉取
         for s in msg.values():
             for k in s:
                 # print(k.offset, k.value)
@@ -58,10 +61,13 @@ def test_bayes(model_file):
                     word_list.append(new_sentences)
                     predict = clf.predict(word_list)
                     for left in predict:
-                        if left == "坐车":
-                            left = "坐高铁"
+                        # if left == "坐车":
+                        #     left = "坐高铁"
                         print(left, "-->", word_list, "-->", sentences)
+                        answer = getAssignAnswer(left)
+                        print("\t", answer)
                         log.logger.info((left, "-->", word_list, "-->", sentences))
+                        log.logger.info(("\t", answer))
                 else:
                     print("咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
                     log.logger.info(("咨询类", "-->", sentences))
