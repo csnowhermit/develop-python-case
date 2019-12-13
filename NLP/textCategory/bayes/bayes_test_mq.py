@@ -7,6 +7,7 @@ from NLP.textCategory.bayes.bayes_train import get_dataset, get_words, split_tra
 from kafka import KafkaConsumer
 from NLP.Logger import *
 from NLP.textCategory.utils.GenIntenAnswer import cache_key, getAssignAnswer
+from NLP.textCategory.utils.PostConsumer import notice
 
 '''
     从文件读取模型并进行分类，从消息队列读取数据
@@ -63,11 +64,14 @@ def test_bayes(model_file):
                     for left in predict:
                         # if left == "坐车":
                         #     left = "坐高铁"
-                        print(left, "-->", word_list, "-->", sentences)
                         answer = getAssignAnswer(left)
-                        print("\t", answer)
+                        result = notice(answer)    # 分析，后通知前端
+                        print(left, "-->", word_list, "-->", sentences)
+                        # print("\t", answer)
+                        print("\t", result)
                         log.logger.info((left, "-->", word_list, "-->", sentences))
-                        log.logger.info(("\t", answer))
+                        # log.logger.info(answer)
+                        log.logger.info(result)
                 else:
                     print("咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
                     log.logger.info(("咨询类", "-->", sentences))
