@@ -48,7 +48,7 @@ def tts():
     pass
 
 def main():
-    message = "指西，直行200米不出门，左右两侧电梯上3楼。"
+    message = "指西，直行200米不出门，左侧电梯上3楼。"
     notice(message)
 
 if __name__ == '__main__':
