@@ -5,7 +5,7 @@ import time
 import win32com.client
 
 '''
-    IAT语音听写：输入为本地wav文件
+    IAT语音听写：输入为本地wav文件（已跑通，网上原版）
     参考自：https://blog.csdn.net/zzz_cming/article/details/81738317
 '''
 

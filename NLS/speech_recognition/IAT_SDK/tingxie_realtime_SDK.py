@@ -8,7 +8,7 @@ import win32com.client
 import threading, time, queue
 
 '''
-    IAT语音听写：输入为麦克风
+    IAT语音听写：输入为麦克风（暂未跑通）
     参考自：https://blog.csdn.net/zzz_cming/article/details/81738317
 '''
 
