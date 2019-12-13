@@ -50,7 +50,7 @@ def get_newest_model(model_path):
 '''
 def test_bayes(model_file):
     def send_msg(*args):    # 新开一个线程调用该方法，发送指令至前端
-        notice(answer)
+        notice(uid, answer)
 
     clf = joblib.load(model_file)
     while True:
@@ -59,6 +59,7 @@ def test_bayes(model_file):
             for k in s:
                 # print(k.offset, k.value)
                 # print(type(k.value), k.value.decode("utf-8"))
+                uid = str(k.offset) + "@" + str(k.partition) + "$" + str(time.time()).replace('.', '')        # 通过该字段在PostConsumer中查日志：offset@partition
                 word_list = []
                 sentences = k.value.decode("utf-8")
                 new_sentences = get_words(sentences)
@@ -71,11 +72,11 @@ def test_bayes(model_file):
                         answer = getAssignAnswer(left)
                         # result = notice(answer)    # 分析，后通知前端
                         thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
-                        print(left, "-->", word_list, "-->", sentences)
-                        log.logger.info((left, "-->", word_list, "-->", sentences))
+                        print(uid, "-->", left, "-->", word_list, "-->", sentences)
+                        log.logger.info((uid, "-->", left, "-->", word_list, "-->", sentences))
                 else:
-                    print("咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
-                    log.logger.info(("咨询类", "-->", sentences))
+                    print(uid, "-->", "咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
+                    log.logger.info((uid, "-->", "咨询类", "-->", sentences))
         time.sleep(0.5)    # 隔0.5s再次拉取
 
 

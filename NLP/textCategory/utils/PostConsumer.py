@@ -2,11 +2,14 @@
 
 import os
 from collections import Counter
+from NLP.Logger import *
 from NLP.textCategory.utils.SubmitActionUtil import submit_msg
 
 '''
     后消费者：将回答切分，传给前端
 '''
+
+log = Logger('D:/data/PostConsumer.log', level='info')
 
 directions1 = ['东', '西', '南', '北']
 directions2 = ['直行', '上', '下', '左', '右', '左右']
@@ -15,7 +18,7 @@ directions2 = ['直行', '上', '下', '左', '右', '左右']
     分析回答并通知前端
     Note：新增参数param，两套日志系统，便于通过uid排错
 '''
-def notice(message):
+def notice(uid, message):
     forward = message[0:2]    # 指向
     msg = message[3:]         # 要合成的语音
     locateArr = []    # 指向后的序列
@@ -38,10 +41,11 @@ def notice(message):
             actions.append(msg[now])
         prev = now
 
-    # 分析完成之后通知前端（异步通知）
+    # 分析完成之后通知前端
     response = submit_msg(forward, actions)
     # print(response, forward, msg, locateArr, actions)
-    return (response, forward, msg, locateArr, actions)
+    log.logger.info((uid, response, forward, msg, locateArr, actions))
+    return (uid, response, forward, msg, locateArr, actions)
 
 '''
     合成语音播放
