@@ -3,8 +3,9 @@
 import os
 import time
 from sklearn.externals import joblib
-from NLP.textCategory.bayes.bayes_train import get_dataset, get_words, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path, isChat
+import _thread as thread
 from kafka import KafkaConsumer
+from NLP.textCategory.bayes.bayes_train import get_dataset, get_words, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path, isChat
 from NLP.Logger import *
 from NLP.textCategory.utils.GenIntenAnswer import cache_key, getAssignAnswer
 from NLP.textCategory.utils.PostConsumer import notice
@@ -48,6 +49,9 @@ def get_newest_model(model_path):
     测试多项式分类器
 '''
 def test_bayes(model_file):
+    def send_msg(*args):    # 新开一个线程调用该方法，发送指令至前端
+        notice(answer)
+
     clf = joblib.load(model_file)
     while True:
         msg = consumer.poll(timeout_ms=1000, max_records=10)  # 每次拉取
@@ -65,13 +69,10 @@ def test_bayes(model_file):
                         # if left == "坐车":
                         #     left = "坐高铁"
                         answer = getAssignAnswer(left)
-                        result = notice(answer)    # 分析，后通知前端
+                        # result = notice(answer)    # 分析，后通知前端
+                        thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
                         print(left, "-->", word_list, "-->", sentences)
-                        # print("\t", answer)
-                        print("\t", result)
                         log.logger.info((left, "-->", word_list, "-->", sentences))
-                        # log.logger.info(answer)
-                        log.logger.info(result)
                 else:
                     print("咨询类", "-->", sentences)    # 闲聊场景，将原话传给闲聊机器人
                     log.logger.info(("咨询类", "-->", sentences))

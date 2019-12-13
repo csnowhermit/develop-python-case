@@ -13,6 +13,7 @@ directions2 = ['直行', '上', '下', '左', '右', '左右']
 
 '''
     分析回答并通知前端
+    Note：新增参数param，两套日志系统，便于通过uid排错
 '''
 def notice(message):
     forward = message[0:2]    # 指向
@@ -39,6 +40,7 @@ def notice(message):
 
     # 分析完成之后通知前端（异步通知）
     response = submit_msg(forward, actions)
+    # print(response, forward, msg, locateArr, actions)
     return (response, forward, msg, locateArr, actions)
 
 '''
