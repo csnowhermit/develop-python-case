@@ -170,7 +170,7 @@ if __name__ == "__main__":
     wsParam = Ws_Param(APPID='5d760a37',
                        APIKey='0881cf5a9cb3548c79e654b26f77b572',
                        APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                       Text="去东站怎么走？去南站怎么走？去机场怎么走？去广州塔怎么走？去大学城怎么走？去珠江新城怎么走？去五羊村怎么走？去白云山怎么走？去长隆怎么走？去佛山怎么走？去珠海怎么走？去深圳怎么走？去顺德怎么走？去万胜围怎么走？去天河公园怎么走？去上社怎么走？去塘下怎么走？")
+                       Text="床前明月光，疑是地上霜。举头望明月，低头思故乡。")
     websocket.enableTrace(False)
     wsUrl = wsParam.create_url()
     ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
