@@ -160,7 +160,7 @@ def play(wav_path):
 
     while True:
         data = wf.readframes(chunk)
-        if data == "":
+        if len(data) == 0 or data == "":
             break
         stream.write(data)
     stream.stop_stream()  # 停止数据流
@@ -174,27 +174,23 @@ if __name__ == "__main__":
     vcnDict = {'小燕': 'xioyan', '小宇': 'xioyu', '小峰': 'xiaofeng', '小梅': 'xiaomei', '小蓉': 'xiaorong', '凯瑟琳': 'catherine'}
 
     strs = ["床前明月光，疑是地上霜。举头望明月，低头思故乡。",
-            "He who doesn't reach the great wall isn't a true man"]
+            "He who doesn't reach the great wall isn't a true man",
+            "直行通道过去，右转有自助售票机。"]
 
-    # 测试时候在此处正确填写相关信息即可运行
-    wsParam = Ws_Param(APPID='5d760a37',
-                       APIKey='0881cf5a9cb3548c79e654b26f77b572',
-                       APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                       Text=strs[0],
-                       vcn="xiaoyu")
-    websocket.enableTrace(False)
-    wsUrl = wsParam.create_url()
-    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+    for s in strs:
+        # 测试时候在此处正确填写相关信息即可运行
+        wsParam = Ws_Param(APPID='5d760a37',
+                           APIKey='0881cf5a9cb3548c79e654b26f77b572',
+                           APISecret='c340e2627a9c1697c117769dbdbb12d5',
+                           Text=s,
+                           vcn="xiaoyu")
+        websocket.enableTrace(False)
+        wsUrl = wsParam.create_url()
+        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+        ws.on_open = on_open
+        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-    # pcm转wav
-    wav_path = pcm2wav("./demo.pcm")
-    print(wav_path)
-    play(wav_path)
-
-
-
-
-
-
+        # pcm转wav
+        wav_path = pcm2wav("./demo.pcm")
+        print(wav_path)
+        play(wav_path)

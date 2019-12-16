@@ -4,6 +4,7 @@ import os
 from collections import Counter
 from NLP.Logger import *
 from NLP.textCategory.utils.SubmitActionUtil import submit_msg
+from NLS.speech_recognition.TTS.tts_webapi import *
 
 '''
     后消费者：将回答切分，传给前端
@@ -50,12 +51,27 @@ def notice(uid, message):
 '''
     合成语音播放
 '''
-def tts():
-    pass
+def tts(msg):
+    wsParam = Ws_Param(APPID='5d760a37',
+                       APIKey='0881cf5a9cb3548c79e654b26f77b572',
+                       APISecret='c340e2627a9c1697c117769dbdbb12d5',
+                       Text=msg,
+                       vcn="xiaofeng")
+    websocket.enableTrace(False)
+    wsUrl = wsParam.create_url()
+    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+    ws.on_open = on_open
+    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+
+    # pcm转wav
+    wav_path = pcm2wav("./demo.pcm")
+    print(wav_path)
+    play(wav_path)
 
 def main():
     message = "指西，直行200米不出门，左侧电梯上3楼。"
-    notice(message)
+    uid = "123.1@2"
+    notice(uid, message)
 
 if __name__ == '__main__':
     main()
