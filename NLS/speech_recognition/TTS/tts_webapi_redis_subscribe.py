@@ -1,19 +1,5 @@
 # -*- coding:utf-8 -*-
-#
-#   author: iflytek
-#
-#  本demo测试时运行的环境为：Windows + Python3.7
-#  本demo测试成功运行时所安装的第三方库及其版本如下：
-#   cffi==1.12.3
-#   gevent==1.4.0
-#   greenlet==0.4.15
-#   pycparser==2.19
-#   six==1.12.0
-#   websocket==0.2.1
-#   websocket-client==0.56.0
-#
-#  错误码链接：https://www.xfyun.cn/document/error-code （code返回错误码时必看）
-# # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # # #
+
 import websocket
 import datetime
 import hashlib
@@ -30,15 +16,16 @@ import _thread as thread
 import os
 import wave
 import pyaudio
+from commonUtils.redisPSUtil.RedisHelper import RedisHelper
 
 '''
-    科大讯飞语音合成：流式版，webAPI
+    语音合成、播报回复
+    数据来源：redis channel：channel_tts
 '''
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
-
 
 class Ws_Param(object):
     # 初始化
@@ -169,27 +156,38 @@ def play(wav_path):
     print('play函数结束！')
 
 
+
 if __name__ == "__main__":
-    vcnDict = {'小燕': 'xioyan', '小宇': 'xioyu', '小峰': 'xiaofeng', '小梅': 'xiaomei', '小蓉': 'xiaorong', '凯瑟琳': 'catherine'}
+    rds = RedisHelper()  # 得到实例化对象
+    while True:
+        data = rds.subscribe("channel_tts").parse_response()
+        if data:
+            text = str(data[2], encoding="utf-8")
+            print(text)
 
-    strs = ["床前明月光，疑是地上霜。举头望明月，低头思故乡。",
-            "He who doesn't reach the great wall isn't a true man",
-            "直行通道过去，右转有自助售票机。"]
+            vcnDict = {'小燕': 'xioyan', '小宇': 'xioyu', '小峰': 'xiaofeng', '小梅': 'xiaomei', '小蓉': 'xiaorong', '凯瑟琳': 'catherine'}
 
-    for s in strs:
-        # 测试时候在此处正确填写相关信息即可运行
-        wsParam = Ws_Param(APPID='5d760a37',
-                           APIKey='0881cf5a9cb3548c79e654b26f77b572',
-                           APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                           Text=s,
-                           vcn="xiaoyu")
-        websocket.enableTrace(False)
-        wsUrl = wsParam.create_url()
-        ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-        ws.on_open = on_open
-        ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
+            # 测试时候在此处正确填写相关信息即可运行
+            wsParam = Ws_Param(APPID='5d760a37',
+                               APIKey='0881cf5a9cb3548c79e654b26f77b572',
+                               APISecret='c340e2627a9c1697c117769dbdbb12d5',
+                               Text=text,
+                               vcn="xiaoyu")
+            websocket.enableTrace(False)
+            wsUrl = wsParam.create_url()
+            ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
+            ws.on_open = on_open
+            ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
-        # pcm转wav
-        wav_path = pcm2wav("./demo.pcm")
-        print(wav_path)
-        play(wav_path)
+            # pcm转wav
+            wav_path = pcm2wav("./demo.pcm")
+            print(wav_path)
+            play(wav_path)
+
+
+
+
+
+        time.sleep(0.5)
+
+

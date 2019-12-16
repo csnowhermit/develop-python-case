@@ -2,9 +2,10 @@
 
 import os
 from collections import Counter
+import _thread as thread
+import redis
 from NLP.Logger import *
 from NLP.textCategory.utils.SubmitActionUtil import submit_msg
-from NLS.speech_recognition.TTS.tts_webapi import *
 
 '''
     后消费者：将回答切分，传给前端
@@ -15,11 +16,16 @@ log = Logger('D:/data/PostConsumer.log', level='info')
 directions1 = ['东', '西', '南', '北']
 directions2 = ['直行', '上', '下', '左', '右', '左右']
 
+r = redis.Redis(host="192.168.117.134", port=6379, password="123456")
+
 '''
     分析回答并通知前端
     Note：新增参数param，两套日志系统，便于通过uid排错
 '''
 def notice(uid, message):
+    def call_remote(*args):    # 用于thread.start_new_thread()调用
+        submit_msg(forward, actions)
+
     forward = message[0:2]    # 指向
     msg = message[3:]         # 要合成的语音
     locateArr = []    # 指向后的序列
@@ -42,31 +48,22 @@ def notice(uid, message):
             actions.append(msg[now])
         prev = now
 
-    # 分析完成之后通知前端
-    response = submit_msg(forward, actions)
+    # # 1.开启新线程通知前端
+    # thread.start_new_thread(call_remote, ())
+
+    # 将要合成的字符串写入channel
+    r.publish(channel="channel_tts", message=msg)
+
+    response = submit_msg(forward, actions)    # 手势动作发送到前端
     # print(response, forward, msg, locateArr, actions)
-    log.logger.info((uid, response, forward, msg, locateArr, actions))
-    return (uid, response, forward, msg, locateArr, actions)
+    log.logger.info((uid, forward, msg, locateArr, actions))
+    return (uid, forward, msg, locateArr, actions)
 
 '''
     合成语音播放
 '''
 def tts(msg):
-    wsParam = Ws_Param(APPID='5d760a37',
-                       APIKey='0881cf5a9cb3548c79e654b26f77b572',
-                       APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                       Text=msg,
-                       vcn="xiaofeng")
-    websocket.enableTrace(False)
-    wsUrl = wsParam.create_url()
-    ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
-    ws.on_open = on_open
-    ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
-
-    # pcm转wav
-    wav_path = pcm2wav("./demo.pcm")
-    print(wav_path)
-    play(wav_path)
+    pass
 
 def main():
     message = "指西，直行200米不出门，左侧电梯上3楼。"
