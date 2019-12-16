@@ -59,7 +59,7 @@ def test_bayes(model_file):
             for k in s:
                 # print(k.offset, k.value)
                 # print(type(k.value), k.value.decode("utf-8"))
-                uid = str(k.offset) + "@" + str(k.partition) + "$" + str(time.time()).replace('.', '')        # 通过该字段在PostConsumer中查日志：offset@partition
+                uid = str(time.time()).replace('.', '') + "." + str(k.offset) + "@" + str(k.partition)         # 通过该字段在PostConsumer中查日志：offset@partition
                 word_list = []
                 sentences = k.value.decode("utf-8")
                 new_sentences = get_words(sentences)

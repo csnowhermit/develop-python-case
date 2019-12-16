@@ -33,6 +33,18 @@ def cache():
     print("cached finished")
     return set(yuyiList)
 
+def getAnswerSet():
+    answers = []
+    with open("../kdata/intention_answer.txt", encoding="utf-8", errors="ignore") as fo:
+        for line in fo.readlines():
+            arr = line.strip().split("\t")
+            answer_arr = arr[2].split("|")
+            for a in answer_arr:
+                answers.append(a)
+    print("Get all answers successed")
+    return set(answers)
+
+
 '''
     通过语义获取回答，出现多个回答时随机返回一个
 '''
@@ -47,6 +59,7 @@ def getAssignAnswer(field):
 
 def main():
     cache()
+    print(getAnswerSet())
 
 if __name__ == '__main__':
     main()

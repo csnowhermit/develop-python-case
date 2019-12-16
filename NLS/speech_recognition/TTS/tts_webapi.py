@@ -42,16 +42,20 @@ STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
 class Ws_Param(object):
     # 初始化
-    def __init__(self, APPID, APIKey, APISecret, Text):
+    def __init__(self, APPID, APIKey, APISecret, Text, vcn='xioyan'):
         self.APPID = APPID
         self.APIKey = APIKey
         self.APISecret = APISecret
         self.Text = Text
+        self.vcn = vcn     # 发音人
 
         # 公共参数(common)
         self.CommonArgs = {"app_id": self.APPID}
         # 业务参数(business)，更多个性化参数可在官网查看
-        self.BusinessArgs = {"aue": "raw", "auf": "audio/L16;rate=16000", "vcn": "xioyan", "tte": "utf8"}
+        # "vcn": "xioyan"，发音人
+        # 小燕（xioyan）、小宇（xioyu）、小峰（xiaofeng）、小梅（xiaomei，粤语）、小蓉（xiaorong）、凯瑟琳（catherine，英语）
+        self.BusinessArgs = {"aue": "raw", "auf": "audio/L16;rate=16000", "tte": "utf8"}
+        self.BusinessArgs["vcn"] = self.vcn
         self.Data = {"status": 2, "text": str(base64.b64encode(self.Text.encode('utf-8')), "UTF8")}
 
     # 生成url
@@ -165,12 +169,19 @@ def play(wav_path):
     print('play函数结束！')
 
 
+# 床前明月光，疑是地上霜。举头望明月，低头思故乡。
 if __name__ == "__main__":
+    vcnDict = {'小燕': 'xioyan', '小宇': 'xioyu', '小峰': 'xiaofeng', '小梅': 'xiaomei', '小蓉': 'xiaorong', '凯瑟琳': 'catherine'}
+
+    strs = ["床前明月光，疑是地上霜。举头望明月，低头思故乡。",
+            "He who doesn't reach the great wall isn't a true man"]
+
     # 测试时候在此处正确填写相关信息即可运行
     wsParam = Ws_Param(APPID='5d760a37',
                        APIKey='0881cf5a9cb3548c79e654b26f77b572',
                        APISecret='c340e2627a9c1697c117769dbdbb12d5',
-                       Text="床前明月光，疑是地上霜。举头望明月，低头思故乡。")
+                       Text=strs[0],
+                       vcn="xiaoyu")
     websocket.enableTrace(False)
     wsUrl = wsParam.create_url()
     ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
@@ -181,3 +192,9 @@ if __name__ == "__main__":
     wav_path = pcm2wav("./demo.pcm")
     print(wav_path)
     play(wav_path)
+
+
+
+
+
+
