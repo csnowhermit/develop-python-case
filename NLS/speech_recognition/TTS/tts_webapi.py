@@ -30,6 +30,7 @@ import _thread as thread
 import os
 import wave
 import pyaudio
+import redis
 
 '''
     科大讯飞语音合成：流式版，webAPI
@@ -39,6 +40,14 @@ STATUS_FIRST_FRAME = 0  # 第一帧的标识
 STATUS_CONTINUE_FRAME = 1  # 中间帧标识
 STATUS_LAST_FRAME = 2  # 最后一帧的标识
 
+base_dir = "D:/data/pcm/"
+os.chdir(base_dir)
+
+'''
+    保存“回答-文件”对应列表，hash
+'''
+r = redis.Redis(host="192.168.117.134", port=6379, password="123456")
+tts_key = "tts"
 
 class Ws_Param(object):
     # 初始化
@@ -48,6 +57,7 @@ class Ws_Param(object):
         self.APISecret = APISecret
         self.Text = Text
         self.vcn = vcn     # 发音人
+        self.save_pcm = os.path.join(base_dir, hashlib.md5(str(self.Text).strip().encode("utf-8")).hexdigest() + ".pcm")
 
         # 公共参数(common)
         self.CommonArgs = {"app_id": self.APPID}
@@ -107,7 +117,7 @@ def on_message(ws, message):
             errMsg = message["message"]
             print("sid:%s call error:%s code is:%s" % (sid, errMsg, code))
         else:
-            with open('./demo.pcm', 'ab') as f:
+            with open(wsParam.save_pcm, 'ab') as f:
                 f.write(audio)
     except Exception as e:
         print("receive msg,but parse exception:", e, message)
@@ -133,8 +143,8 @@ def on_open(ws):
         d = json.dumps(d)
         print("------>开始发送文本数据")
         ws.send(d)
-        if os.path.exists('./demo.pcm'):
-            os.remove('./demo.pcm')
+        if os.path.exists(wsParam.save_pcm):
+            os.remove(wsParam.save_pcm)
 
     thread.start_new_thread(run, ())
 
@@ -170,6 +180,9 @@ def play(wav_path):
 
 
 if __name__ == "__main__":
+    if r.exists(tts_key) is True:  # 确保每次都是全新加载的
+        r.delete(tts_key)
+
     vcnDict = {'小燕': 'xioyan', '小宇': 'xioyu', '小峰': 'xiaofeng', '小梅': 'xiaomei', '小蓉': 'xiaorong', '凯瑟琳': 'catherine'}
 
     strs = ["直行200米在大门口左转。",
@@ -232,6 +245,10 @@ if __name__ == "__main__":
         ws.run_forever(sslopt={"cert_reqs": ssl.CERT_NONE})
 
         # pcm转wav
-        wav_path = pcm2wav("./demo.pcm")
+        wav_path = pcm2wav(wsParam.save_pcm)
+        key = hashlib.md5(str(wsParam.Text).strip().encode("utf-8")).hexdigest()
+        r.hset(tts_key, str(key).strip(), wav_path)    # redis hash保存“文本-wav文件”对应关系
         print(wav_path)
-        play(wav_path)
+        # play(wav_path)
+
+

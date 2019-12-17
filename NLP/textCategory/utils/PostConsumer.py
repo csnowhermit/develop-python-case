@@ -4,8 +4,10 @@ import os
 from collections import Counter
 import _thread as thread
 import redis
+import hashlib
 from NLP.Logger import *
 from NLP.textCategory.utils.SubmitActionUtil import submit_msg
+from NLS.speech_recognition.TTS.tts_webapi import tts_key
 
 '''
     后消费者：将回答切分，传给前端
@@ -51,10 +53,12 @@ def notice(uid, message):
     # # 1.开启新线程通知前端
     # thread.start_new_thread(call_remote, ())
 
-    # 将要合成的字符串写入channel
-    r.publish(channel="channel_tts", message=msg)
+    # # 将要合成的字符串写入channel
+    # r.publish(channel="channel_tts", message=msg)
+    key = hashlib.md5(str(msg).strip().encode("utf-8")).hexdigest()
+    play_filepath = r.hget(tts_key, str(key).strip())
 
-    response = submit_msg(forward, actions)    # 手势动作发送到前端
+    response = submit_msg(forward, actions, play_filepath.decode("utf-8"))    # 手势动作发送到前端
     # print(response, forward, msg, locateArr, actions)
     log.logger.info((uid, forward, msg, locateArr, actions))
     return (uid, forward, msg, locateArr, actions)

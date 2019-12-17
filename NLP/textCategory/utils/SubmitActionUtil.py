@@ -23,7 +23,7 @@ positionDict["直"] = "StraightLine"    # 直行，straight line
 positionDict["回答"] = "AnswersNotFound"
 
 
-def submit_msg(forward, actions):
+def submit_msg(forward, actions, play_filepath):
     # 伪装成浏览器
     headers = {
         'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36"}
@@ -48,13 +48,15 @@ def submit_msg(forward, actions):
 
     data["forward"] = positionDict[forward]
     data["actions"] = actionArr
+    data['play_filename'] = play_filepath
     response = requests.post(base_url, json.dumps(data))
     return response
 
 def main():
     forward = "指东"
     actions = ['直', '左右', '上']
-    response = submit_msg(forward, actions)
+    play_filepath = "/test.wav"
+    response = submit_msg(forward, actions, play_filepath)
     print(response)
 
 if __name__ == '__main__':

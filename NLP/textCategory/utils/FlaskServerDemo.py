@@ -16,7 +16,8 @@ def call():
         if request.method == "GET":
             forward = request.args.get('forward')
             actions = request.args.get('actions')
-            print('<p>GET %s, %s, %s</p>' % (forward, actions, user_agent))
+            play_filepath = request.args.get('play_filepath')
+            print('<p>GET %s, %s, %s, %s</p>' % (forward, actions, play_filepath, user_agent))
         elif request.method == "POST":
             get_data = json.loads(request.get_data(as_text=True))
             print('<p>POST %s</p>' % (get_data))
