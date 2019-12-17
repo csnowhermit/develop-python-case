@@ -59,7 +59,6 @@ def getAssignAnswer(field):
 
 def main():
     cache()
-    print(getAnswerSet())
 
 if __name__ == '__main__':
     main()
