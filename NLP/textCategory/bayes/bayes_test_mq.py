@@ -70,8 +70,8 @@ def test_bayes(model_file):
                         # if left == "坐车":
                         #     left = "坐高铁"
                         answer = getAssignAnswer(left)
-                        # result = notice(answer)    # 分析，后通知前端
-                        thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
+                        result = notice(uid, answer)    # 分析，后通知前端
+                        # thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
                         print(uid, "-->", left, "-->", word_list, "-->", sentences)
                         log.logger.info((uid, "-->", left, "-->", word_list, "-->", sentences))
                 else:

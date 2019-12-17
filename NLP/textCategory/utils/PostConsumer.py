@@ -26,7 +26,7 @@ r = redis.Redis(host="192.168.117.134", port=6379, password="123456")
 '''
 def notice(uid, message):
     def call_remote(*args):    # 用于thread.start_new_thread()调用
-        submit_msg(forward, actions)
+        submit_msg(forward, actions, play_filepath)
 
     forward = message[0:2]    # 指向
     msg = message[3:]         # 要合成的语音

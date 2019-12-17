@@ -249,6 +249,6 @@ if __name__ == "__main__":
         key = hashlib.md5(str(wsParam.Text).strip().encode("utf-8")).hexdigest()
         r.hset(tts_key, str(key).strip(), wav_path)    # redis hash保存“文本-wav文件”对应关系
         print(wav_path)
-        # play(wav_path)
+        play(wav_path)
 
 
