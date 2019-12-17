@@ -82,10 +82,13 @@ def test_bayes(model_file):
 
 def main():
     # test_bayes(get_newest_model(multinamialNB_save_path))
-    test_bayes(get_newest_model(bernousNB_save_path))
+    # test_bayes(get_newest_model(bernousNB_save_path))
     # print(get_newest_model(multinamialNB_save_path))
     # print(get_newest_model(bernousNB_save_path))
     # divideTestSet(test_set)
+
+    model_file = "D:/workspace/Pycharm_Projects/develop-python-case/NLP/textCategory/bayes/model/bernousNB/bernousNB_1576579523_9512195121951219_0_0.m"
+    test_bayes(model_file)
 
 if __name__ == '__main__':
     main()
