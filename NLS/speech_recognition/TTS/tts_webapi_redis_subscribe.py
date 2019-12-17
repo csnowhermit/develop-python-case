@@ -21,6 +21,13 @@ from commonUtils.redisPSUtil.RedisHelper import RedisHelper
 '''
     语音合成、播报回复
     数据来源：redis channel：channel_tts
+    发音人：{'小燕': 'xioyan', '小宇': 'xioyu', '小峰': 'xiaofeng', '小梅': 'xiaomei', '小蓉': 'xiaorong', '凯瑟琳': 'catherine'}
+            {'许久-亲切男声': 'xujiu', '小萍-知性女声': 'xiaoping', '许小宝-可爱童声': 'xuxiaobao', '小婧-亲切女声': 'xiaojing'}
+    男声：xiaoyu（有点生硬）、xiaofeng（音色好点）
+        Example：直行200米出门左转。
+            xiaoyu：liang3 bai2 mi3
+            xiaofeng：liang2 bai3 mi3
+    女声：xiaoyan（普通话，太过生硬）、xiaomei（粤语）、xiaorong（四川话）、catherine（英文）
 '''
 
 STATUS_FIRST_FRAME = 0  # 第一帧的标识
@@ -172,7 +179,7 @@ if __name__ == "__main__":
                                APIKey='0881cf5a9cb3548c79e654b26f77b572',
                                APISecret='c340e2627a9c1697c117769dbdbb12d5',
                                Text=text,
-                               vcn="xiaofeng")
+                               vcn="xiaojing")
             websocket.enableTrace(False)
             wsUrl = wsParam.create_url()
             ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)

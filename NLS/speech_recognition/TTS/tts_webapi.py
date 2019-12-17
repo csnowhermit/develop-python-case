@@ -182,7 +182,7 @@ if __name__ == "__main__":
                            APIKey='0881cf5a9cb3548c79e654b26f77b572',
                            APISecret='c340e2627a9c1697c117769dbdbb12d5',
                            Text=s,
-                           vcn="xiaoyu")
+                           vcn="xiaojing")
         websocket.enableTrace(False)
         wsUrl = wsParam.create_url()
         ws = websocket.WebSocketApp(wsUrl, on_message=on_message, on_error=on_error, on_close=on_close)
