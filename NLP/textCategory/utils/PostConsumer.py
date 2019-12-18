@@ -5,6 +5,7 @@ from collections import Counter
 import _thread as thread
 import redis
 import hashlib
+import traceback
 from NLP.Logger import *
 from NLP.textCategory.utils.SubmitActionUtil import submit_msg
 from NLS.speech_recognition.TTS.tts_webapi import tts_key, base_dir, play
@@ -55,13 +56,17 @@ def notice(uid, message):
 
     # # 将要合成的字符串写入channel
     # r.publish(channel="channel_tts", message=msg)
-    key = hashlib.md5(str(msg).strip().encode("utf-8")).hexdigest()
-    play_filepath = r.hget(tts_key, str(key).strip()).decode("utf-8")
+    try:
+        key = hashlib.md5(str(msg).strip().encode("utf-8")).hexdigest()
+        play_filepath = r.hget(tts_key, str(key).strip()).decode("utf-8")
 
-    response = submit_msg(forward, actions, play_filepath)    # 手势动作发送到前端
-    play(os.path.join(base_dir, play_filepath))    # 播放回答文件
-    # print(response, forward, msg, locateArr, actions)
-    log.logger.info((uid, forward, msg, locateArr, actions))
+        response = submit_msg(forward, actions, play_filepath)  # 手势动作发送到前端
+        play(os.path.join(base_dir, play_filepath))  # 播放回答文件
+        # print(response, forward, msg, locateArr, actions)
+        log.logger.info((uid, forward, msg, locateArr, actions))
+    except:
+        log.logger.error((uid, forward, msg, locateArr, actions))
+        log.logger.error(traceback.format_exc())
     return (uid, forward, msg, locateArr, actions)
 
 '''

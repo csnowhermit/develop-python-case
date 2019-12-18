@@ -21,7 +21,7 @@ log = Logger('D:/data/bayes_mq.log', level='info')
 
 # auto_offset_reset='latest'，最多消费一次
 # auto_offset_reset='earliest'，最少消费一次
-consumer = KafkaConsumer(topic, auto_offset_reset='earliest', bootstrap_servers=bootstrap_server)
+consumer = KafkaConsumer(topic, auto_offset_reset='latest', bootstrap_servers=bootstrap_server)
 # print(consumer)
 
 # test_data = get_dataset()
@@ -48,7 +48,7 @@ def get_newest_model(model_path):
         log.logger.info(("Use Model: %s" % (os.path.join(model_full_path, filelist[0]))))
         return os.path.join(model_full_path, filelist[0])
     else:
-        log.logger.info("Model path is not exists")
+        log.logger("Model path is not exists")
 
 
 '''
