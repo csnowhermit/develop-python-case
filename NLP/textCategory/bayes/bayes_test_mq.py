@@ -39,10 +39,16 @@ def divideTestSet(test_set):
     获取最新的模型
 '''
 def get_newest_model(model_path):
-    if os.path.exists(model_path):
+    model_full_path = os.path.join(os.path.dirname(__file__), model_path)
+    model_full_path = model_full_path.replace('\\', '').replace('.', '')
+
+    if os.path.exists(model_full_path):
         # 按文件最后修改时间排序，reverse=True表示降序排序
-        filelist = sorted(os.listdir(model_path), key=lambda x: os.path.getctime(os.path.join(model_path, x)), reverse=True)
-        return os.path.join(model_path, filelist[0])
+        filelist = sorted(os.listdir(model_full_path), key=lambda x: os.path.getctime(os.path.join(model_full_path, x)), reverse=True)
+        log.logger.info(("Use Model: %s" % (os.path.join(model_full_path, filelist[0]))))
+        return os.path.join(model_full_path, filelist[0])
+    else:
+        log.logger.info("Model path is not exists")
 
 
 '''
@@ -82,13 +88,13 @@ def test_bayes(model_file):
 
 def main():
     # test_bayes(get_newest_model(multinamialNB_save_path))
-    # test_bayes(get_newest_model(bernousNB_save_path))
+    test_bayes(get_newest_model(bernousNB_save_path))
     # print(get_newest_model(multinamialNB_save_path))
     # print(get_newest_model(bernousNB_save_path))
     # divideTestSet(test_set)
 
-    model_file = "D:/workspace/Pycharm_Projects/develop-python-case/NLP/textCategory/bayes/model/bernousNB/bernousNB_1576579523_9512195121951219_0_0.m"
-    test_bayes(model_file)
+    # model_file = "D:/workspace/Pycharm_Projects/develop-python-case/NLP/textCategory/bayes/model/bernousNB/bernousNB_1576579523_9512195121951219_0_0.m"
+    # test_bayes(model_file)
 
 if __name__ == '__main__':
     main()
