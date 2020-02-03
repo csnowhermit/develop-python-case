@@ -2,7 +2,7 @@ from PIL import Image
 from PIL import ImageChops
 
 '''
-    图像对比
+    图像对比：输出两张图片的不同点到图片文件
 '''
 
 def compare_images(path_one, path_two, diff_save_location):
