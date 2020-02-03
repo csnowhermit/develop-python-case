@@ -4,7 +4,7 @@ import operator
 from functools import reduce
 
 '''
-    图像对比：计算图像的差异值
+    图像对比：计算图像的差异值：越不一样，差异值越大
     通过math.sqrt(直方图)的方式计算差异值
 '''
 
