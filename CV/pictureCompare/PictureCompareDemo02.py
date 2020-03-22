@@ -20,7 +20,7 @@ def image_contrast(img1, img2):
     return result
 
 if __name__ == '__main__':
-    left = "D:/data/ss/gz03.jpg"
-    right = "D:/data/ss/gz03c.jpg"
+    left = "D:/logs/before.jpg"
+    right = "D:/logs/loss.jpg"
     result = image_contrast(left, right)
     print(result)

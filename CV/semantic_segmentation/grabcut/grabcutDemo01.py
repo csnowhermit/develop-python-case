@@ -8,7 +8,7 @@ from PIL import Image
     分割之后的图：背景为黑色，其余地方不变
 '''
 
-img = cv2.imread('D:/data/ss/gz03c.jpg')
+img = cv2.imread('D:/logs/loss.jpg')
 OLD_IMG = img.copy()
 mask = np.zeros(img.shape[:2], np.uint8)
 SIZE = (1, 65)

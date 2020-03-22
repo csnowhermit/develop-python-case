@@ -61,20 +61,20 @@ def grabcutImageAndSave(source_path):
 
 if __name__ == '__main__':
     # 原图比较
-    left = "D:/data/ss/gz03.jpg"
-    right = "D:/data/ss/gz03c.jpg"
-    result = "D:/data/ss/我们不一样.jpg"
+    left = "D:/logs/before.jpg"
+    right = "D:/logs/loss.jpg"
+    result = "D:/logs/我们不一样.jpg"
     # compare_images(left,
     #                right,
     #                result)    # 图片所有内容比较
 
     left_dest = grabcutImageAndSave(left)
     right_dest = grabcutImageAndSave(right)
-    compare_images(left_dest,
-                   right_dest,
+    compare_images(left,
+                   right,
                    result)      # 图像分割后部分比较（降低不必比较部分的噪音的干扰）
 
     from CV.pictureCompare.PictureCompareDemo02 import image_contrast
 
-    similarityDegree = image_contrast(left_dest, right_dest)    # 计算两图片的差异值
+    similarityDegree = image_contrast(left, right)    # 计算两图片的差异值
     print("差异值", similarityDegree)
