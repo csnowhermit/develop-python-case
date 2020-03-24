@@ -44,3 +44,7 @@ https://github.com/tensorflow/models/tree/master/research/slim
 
 PTB数据：http://www.fit.vutbr.cz/~imikolov/rnnlm/simple-examples.tgz
 
+# 3、cat_dog_reco
+
+​	图像识别Demo：猫狗识别；
+
