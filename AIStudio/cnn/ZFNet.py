@@ -1,14 +1,14 @@
 import tensorflow as tf
 
 '''
-    AlexNet的Keras实现
+    ZF-Net的Keras实现
 '''
 
 model = tf.keras.models.Sequential([
-    tf.keras.layers.Conv2D(96, (11, 11), strides=(4, 4), input_shape=(227, 227, 3),
+    tf.keras.layers.Conv2D(96, (7, 7), strides=(2, 2), input_shape=(227, 227, 3),
                            padding='valid', activation='relu', kernel_initializer='uniform'),    # conv1
     tf.keras.layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)),
-    tf.keras.layers.Conv2D(256, (5, 5), strides=(1, 1),
+    tf.keras.layers.Conv2D(256, (5, 5), strides=(2, 2),
                            padding='same', activation='relu', kernel_initializer='uniform'),    # conv2
     tf.keras.layers.MaxPooling2D(pool_size=(3, 3), strides=(2, 2)),
     tf.keras.layers.Conv2D(384, (3, 3), strides=(1, 1),
@@ -30,9 +30,9 @@ model = tf.keras.models.Sequential([
 
 def AlexNet():
     model = tf.keras.models.Sequential()
-    model.add(tf.keras.layers.Conv2D(96,(11,11),strides=(4,4),input_shape=(227,227,3),padding='valid',activation='relu',kernel_initializer='uniform'))
+    model.add(tf.keras.layers.Conv2D(96,(7,7),strides=(2,2),input_shape=(227,227,3),padding='valid',activation='relu',kernel_initializer='uniform'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(3,3),strides=(2,2)))
-    model.add(tf.keras.layers.Conv2D(256,(5,5),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
+    model.add(tf.keras.layers.Conv2D(256,(5,5),strides=(2,2),padding='same',activation='relu',kernel_initializer='uniform'))
     model.add(tf.keras.layers.MaxPooling2D(pool_size=(3,3),strides=(2,2)))
     model.add(tf.keras.layers.Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
     model.add(tf.keras.layers.Conv2D(384,(3,3),strides=(1,1),padding='same',activation='relu',kernel_initializer='uniform'))
