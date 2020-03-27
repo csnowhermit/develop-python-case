@@ -87,7 +87,9 @@ with tf.Session() as sess:
 
     # 在[-max_delta, max_delta]的范围内随机调整图像色相
     x = np.random.rand(1, 1)[0][0]
-    adjusted = tf.image.random_hue(img_data, max_delta=x)
+    if x > 0.5:
+        x = 0.5
+        adjusted = tf.image.random_hue(img_data, max_delta=x)
     plt.imshow(adjusted.eval())
     plt.title(u"图像色相随机调整：%s" % x)
     plt.show()

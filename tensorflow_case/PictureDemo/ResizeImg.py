@@ -14,7 +14,7 @@ image_row_data = tf.gfile.FastGFile('./xp.jpg', 'rb').read()
 
 with tf.Session() as sess:
     img_data = tf.image.decode_jpeg(image_row_data)    # 对图像进行jpeg的格式解码得到图像对应的三维矩阵
-    print(img_data.eval())    # 输出解码之后的三维矩阵
+    print(img_data.eval().shape)    # 输出解码之后的三维矩阵
 
     # 使plt.title()的中文正常显示
     plt.rcParams['font.sans-serif'] = ['SimHei']
@@ -33,7 +33,7 @@ with tf.Session() as sess:
     # 2.通过tf.image.resize_images()调整图像的大小。
     # 注意：如果输入数据为unit8格式，那么输出为0～255之内的实数，不方便后续处理。
     # method=0：双线性插值法
-    resized = tf.image.resize_images(img_data, [300, 300], method=0)
+    resized = tf.image.resize_images(img_data, [1800, 2880], method=0)
 
     # 3.通过pyplot将resize后的图像可视化
     plt.imshow(resized.eval())
@@ -41,7 +41,7 @@ with tf.Session() as sess:
     plt.show()
 
     # method=1：最近邻居法
-    resized = tf.image.resize_images(img_data, [300, 300], method=1)
+    resized = tf.image.resize_images(img_data, [1800, 2880], method=1)
 
     # 3.通过pyplot将resize后的图像可视化
     plt.imshow(resized.eval())
@@ -49,7 +49,7 @@ with tf.Session() as sess:
     plt.show()
 
     # method=2：双三次插值法
-    resized = tf.image.resize_images(img_data, [300, 300], method=2)
+    resized = tf.image.resize_images(img_data, [1800, 2880], method=2)
 
     # 3.通过pyplot将resize后的图像可视化
     plt.imshow(resized.eval())
@@ -57,7 +57,7 @@ with tf.Session() as sess:
     plt.show()
 
     # method=3：面积插值法
-    resized = tf.image.resize_images(img_data, [300, 300], method=3)
+    resized = tf.image.resize_images(img_data, [1800, 2880], method=3)
 
     # 3.通过pyplot将resize后的图像可视化
     plt.imshow(resized.eval())
