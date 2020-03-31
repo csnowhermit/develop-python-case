@@ -61,15 +61,18 @@ def grabcutImageAndSave(source_path):
 
 if __name__ == '__main__':
     # 原图比较
-    left = "D:/logs/before.jpg"
-    right = "D:/logs/loss.jpg"
-    result = "D:/logs/我们不一样.jpg"
+    left = "D:/logs/before_Canny.jpg"
+    right = "D:/logs/Canny_without_bluring.jpg"
+    result = "D:/logs/我们不一样_Canny.jpg"
+    # left = "D:/logs/before_Laplacian.jpg"
+    # right = "D:/logs/laplacian.jpg"
+    # result = "D:/logs/我们不一样_Laplacian.jpg"
     # compare_images(left,
     #                right,
     #                result)    # 图片所有内容比较
 
-    left_dest = grabcutImageAndSave(left)
-    right_dest = grabcutImageAndSave(right)
+    # left_dest = grabcutImageAndSave(left)
+    # right_dest = grabcutImageAndSave(right)
     compare_images(left,
                    right,
                    result)      # 图像分割后部分比较（降低不必比较部分的噪音的干扰）

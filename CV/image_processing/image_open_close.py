@@ -3,7 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 
 '''
-    图像的开闭运算
+    图像的开闭运算，参考：https://homepages.inf.ed.ac.uk/rbf/HIPR2/morops.htm
     开运算：先腐蚀，再扩张；
     闭运算：先扩张，再腐蚀；
 '''

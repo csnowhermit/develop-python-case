@@ -6,8 +6,8 @@ import numpy as np
     自适应阀值化
 '''
 
-file = "C:/Users/ASUS/Desktop/广州南站.jpg"
-# file = "D:/logs/before.jpg"
+# file = "C:/Users/ASUS/Desktop/广州南站.jpg"
+file = "D:/logs/loss.jpg"
 img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2GRAY)
 
