@@ -7,8 +7,8 @@ import numpy as np
     拉普拉斯计算：使用两个方向上的二阶导数
 '''
 
-# file = "C:/Users/ASUS/Desktop/广州南站.jpg"
-file = "D:/logs/before.jpg"
+file = "C:/Users/ASUS/Desktop/003-007-6003.jpg"
+# file = "D:/logs/before.jpg"
 img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
