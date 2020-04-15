@@ -1,4 +1,5 @@
 # setup_fib.py
+import numpy
 from Cython.Build import cythonize
 from distutils.core import setup, Extension
 
@@ -13,9 +14,9 @@ setup(
   ext_modules=cythonize(Extension('fibonacci_cython',    # 生成的动态链接库名字
                   sources=['fibonacci.pyx'],    # 需要的包括.pyx和.c/.cpp文件
                   language='c',        # 默认是c，也可以是c++
-                  include_dirs=[],     # gcc -I 参数
+                  include_dirs=[numpy.get_include()],     # gcc -I 参数
                   library_dirs=[],     # gcc -L 参数
                   libraries=[],        # gcc -l 参数
-                  extra_compile_args=["-DPLATFORM=linux"],    # 传给gcc的额外编译参数
+                  extra_compile_args=[],    # 传给gcc的额外编译参数
                   extra_link_args=[]))      # 传给gcc的额外链接参数
 )
