@@ -1,14 +1,11 @@
 # -*- coding:utf-8 -*-
 
 import os
-import time
 import random
 import socket
 import configparser
 from sklearn.externals import joblib
-import _thread as thread
-from kafka import KafkaConsumer
-from NLP.textCategory.bayes.bayes_train import get_dataset, get_words, split_train_and_test_set, multinamialNB_save_path, bernousNB_save_path, isChat
+from NLP.textCategory.bayes.bayes_train import get_words, bernousNB_save_path, isChat
 from NLP.Logger import *
 
 '''
@@ -16,17 +13,6 @@ from NLP.Logger import *
 '''
 
 log = Logger('D:/data/bayes_mq.log', level='info')
-
-# test_data = get_dataset()
-# train_set_tmp, train_label_tmp, test_set, test_label = split_train_and_test_set(test_data, 0.0)
-
-# '''
-#     分离出来
-# '''
-# def divideTestSet(test_set):
-#     for tset in test_set:
-#         print(tset)
-#         # pass
 
 AnswerDict = []
 intentionList = []
