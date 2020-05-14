@@ -7,7 +7,7 @@ import numpy as np
     拉普拉斯计算：使用两个方向上的二阶导数
 '''
 
-file = "C:/Users/ASUS/Desktop/003-007-6003.jpg"
+file = "G:/workspace/workspace_python/mx_AI/passflow-detect/ml/10.6.8.181_01_20200403174021755.mp4_frame_1610.jpg"
 # file = "D:/logs/before.jpg"
 img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
@@ -20,6 +20,7 @@ laplacian = cv2.Laplacian(img, cv2.CV_64F)    # 做拉普拉斯计算（两个�
 
 # Plot the images
 images = [sobel_x, sobel_y, blended, laplacian]
+labels = ["sobel_x", "sobel_y", "blended", "laplacian"]
 plt.figure(figsize = (20, 20))
 for i in range(len(images)):
     plt.subplot(1, 4, i+1)
@@ -29,4 +30,4 @@ plt.show()
 
 for i in range(len(images)):
     # im = cv2.cvtColor(images[i], cv2.COLOR_GRAY2BGR)
-    cv2.imwrite("image_gradient_img_" + str(i) + ".jpg", images[i])
+    cv2.imwrite("image_gradient_img_" + str(labels[i]) + ".jpg", images[i])
