@@ -1,18 +1,24 @@
 # -*- coding:utf-8 -*-
 
 import os
+import time
+import json
 import random
 import socket
 import configparser
+import traceback
+import itertools
+import pika
 from sklearn.externals import joblib
-from NLP.textCategory.bayes.bayes_train import get_words, bernousNB_save_path, isChat
-from NLP.Logger import *
+from bayes.bayes_train import get_words, bernousNB_save_path, isChat
+from Logger import *
 
 '''
     从文件读取模型并进行分类，打开socket，接收消息
 '''
 
-log = Logger('D:/data/bayes_mq.log', level='info')
+logfile = 'D:/data/bayes_from_socket.log'
+log = Logger(logfile, level='info')
 
 AnswerDict = []
 intentionList = []
@@ -47,7 +53,7 @@ def get_newest_model(model_path):
 '''
     读取配置文件，获取打开SocketServer的ip和端口
 '''
-def getConfig():
+def getSocketConfig():
     cf = configparser.ConfigParser()
     cf.read("../kdata/config.conf")
     host = str(cf.get("sserver", "host"))
@@ -55,23 +61,77 @@ def getConfig():
     return host, port
 
 '''
+    获取rabbitmq连接
+'''
+def getRabbitConn():
+    cf = configparser.ConfigParser()
+    cf.read("../kdata/config.conf")
+    host = str(cf.get("rabbit", "host"))
+    port = int(cf.get("rabbit", "port"))
+    username = str(cf.get("rabbit", "username"))
+    password = str(cf.get("rabbit", "password"))
+    EXCHANGE_NAME = str(cf.get("rabbit", "EXCHANGE_NAME"))
+    vhost = str(cf.get("rabbit", "vhost"))
+    routingKey = str(cf.get("rabbit", "routingKey"))
+
+    credentials = pika.PlainCredentials(username=username, password=password)
+    connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port, virtual_host=vhost, credentials=credentials))
+    channel = connection.channel()
+    # channel.queue_declare(queue=routingKey, durable=True)    # 定义持久化队列
+    # channel.queue_declare(queue=routingKey)  # 定义持久化队列
+
+    return channel, EXCHANGE_NAME, routingKey
+
+'''
     测试多项式分类器
 '''
 def test_bayes(model_file):
     clf = joblib.load(model_file)
     # loadAnswers()    # 加载 意图-答案 表
+    channel, EXCHANGE_NAME, routingKey = getRabbitConn()
+    log.logger.info("rabbit producer 已启动：%s %s %s" % (channel, EXCHANGE_NAME, routingKey))
+    print("rabbit producer 已启动：%s %s %s" % (channel, EXCHANGE_NAME, routingKey))
 
     sev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP连接
-    HOST, PORT = getConfig()
-    sev.bind((HOST, PORT))
+    HOST, PORT = getSocketConfig()
+    sev.bind((HOST, PORT))    # 192.168.120.133是连安卓时用
     sev.listen()
+    log.logger.info("语义识别端已启动。。。")
     print("语义识别端已启动。。。")
 
     conn, addr = sev.accept()
+    log.logger.info("%s %s" % (conn, addr))
+    print(conn, addr)
     log.logger.info((conn, addr))
+    sentences = ""
+    empty_package_nums = 0    # 记录空包的数量
 
     while True:
-        sentences = bytes.decode(conn.recv(4096), encoding='utf-8')
+        try:
+            recvStr = bytes.decode(conn.recv(4096), encoding='utf-8')
+            if len(recvStr) == 0:    # 如果是安卓客户端，当客户端断开时，服务端收到的是空包
+                empty_package_nums +=1
+                if empty_package_nums >= 20000:
+                    raise ConnectionResetError
+                continue
+            else:
+                empty_package_nums = 0    # 如果遇到非空包来，则空包数量重新计数
+
+            recvJson = json.loads(recvStr)
+            log.logger.info(recvJson)
+            daotaiID = recvJson["daotaiID"]
+            sentences = recvJson["message"]
+            timestamp = recvJson["timestamp"]
+        except ConnectionResetError as connectionResetError:
+            log.logger.warn("客户端已断开，正在等待重连: ", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+            print("客户端已断开，正在等待重连: ", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+            conn, addr = sev.accept()
+            log.logger.info("%s %s" % (conn, addr))
+            print(conn, addr)
+            log.logger.info((conn, addr))
+        except Exception as e:
+            traceback.print_exc(file=open(logfile, 'a+'))
+            continue
 
         word_list = []
         new_sentences = get_words(sentences)
@@ -85,6 +145,24 @@ def test_bayes(model_file):
                 # thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
                 print(left, "-->", word_list, "-->", sentences)
                 log.logger.info((left, "-->", word_list, "-->", sentences))
+
+                yuyiDict = {}
+                yuyiDict["daotaiID"] = daotaiID
+                yuyiDict["sentences"] = sentences
+                yuyiDict["timestamp"] = timestamp
+                yuyiDict["intention"] = left    # 意图
+
+                # 之后将yuyiDict写入到消息队列
+                # channel.basic_publish(exchange=EXCHANGE_NAME,
+                #                       routing_key=routingKey,
+                #                       body=str(yuyiDict),
+                #                       properties=pika.BasicProperties(    # 如果仅仅是设置了队列的持久化，仅队列本身可以在rabbit-server宕机后保留，队列中的信息依然会丢失，如果想让队列中的信息或者任务保留，还需要这行代码
+                #                           delivery_mode=2,  # 使消息或任务也持久化存储
+                #                       ))
+                channel.basic_publish(exchange=EXCHANGE_NAME,
+                                      routing_key=routingKey,
+                                      body=str(yuyiDict))
+
         else:
             print("咨询类", "-->", sentences)  # 闲聊场景，将原话传给闲聊机器人
             log.logger.info(("咨询类", "-->", sentences))
