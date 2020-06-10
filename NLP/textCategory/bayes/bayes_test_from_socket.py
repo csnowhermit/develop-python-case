@@ -62,17 +62,18 @@ def getSocketConfig():
 
 '''
     获取rabbitmq连接
+    :param nodeName 指定配置文件的哪个节点
 '''
-def getRabbitConn():
+def getRabbitConn(nodeName):
     cf = configparser.ConfigParser()
     cf.read("../kdata/config.conf")
-    host = str(cf.get("rabbit", "host"))
-    port = int(cf.get("rabbit", "port"))
-    username = str(cf.get("rabbit", "username"))
-    password = str(cf.get("rabbit", "password"))
-    EXCHANGE_NAME = str(cf.get("rabbit", "EXCHANGE_NAME"))
-    vhost = str(cf.get("rabbit", "vhost"))
-    routingKey = str(cf.get("rabbit", "routingKey"))
+    host = str(cf.get(nodeName, "host"))
+    port = int(cf.get(nodeName, "port"))
+    username = str(cf.get(nodeName, "username"))
+    password = str(cf.get(nodeName, "password"))
+    EXCHANGE_NAME = str(cf.get(nodeName, "EXCHANGE_NAME"))
+    vhost = str(cf.get(nodeName, "vhost"))
+    routingKey = str(cf.get(nodeName, "routingKey"))
 
     credentials = pika.PlainCredentials(username=username, password=password)
     connection = pika.BlockingConnection(pika.ConnectionParameters(host=host, port=port, virtual_host=vhost, credentials=credentials))
@@ -88,9 +89,13 @@ def getRabbitConn():
 def test_bayes(model_file):
     clf = joblib.load(model_file)
     # loadAnswers()    # 加载 意图-答案 表
-    channel, EXCHANGE_NAME, routingKey = getRabbitConn()
-    log.logger.info("rabbit producer 已启动：%s %s %s" % (channel, EXCHANGE_NAME, routingKey))
-    print("rabbit producer 已启动：%s %s %s" % (channel, EXCHANGE_NAME, routingKey))
+    backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey = getRabbitConn("rabbit2backstage")
+    log.logger.info("rabbit2backstage producer 已启动：%s %s %s" % (backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey))
+    print("rabbit2backstage producer 已启动：%s %s %s" % (backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey))
+
+    portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey = getRabbitConn("rabbit2portrait")
+    log.logger.info("rabbit2portrait producer 已启动：%s %s %s" % (portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey))
+    print("rabbit2portrait producer 已启动：%s %s %s" % (portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey))
 
     sev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP连接
     HOST, PORT = getSocketConfig()
@@ -159,10 +164,22 @@ def test_bayes(model_file):
                 #                       properties=pika.BasicProperties(    # 如果仅仅是设置了队列的持久化，仅队列本身可以在rabbit-server宕机后保留，队列中的信息依然会丢失，如果想让队列中的信息或者任务保留，还需要这行代码
                 #                           delivery_mode=2,  # 使消息或任务也持久化存储
                 #                       ))
-                channel.basic_publish(exchange=EXCHANGE_NAME,
-                                      routing_key=routingKey,
-                                      body=str(yuyiDict))
+                backstage_channel.basic_publish(exchange=backstage_EXCHANGE_NAME,
+                                                routing_key=backstage_routingKey,
+                                                body=str(yuyiDict))    # 将语义识别结果给到后端
 
+                # 人物画像端
+                portraitDict = {}    # 人物画像要填的字段
+                portraitDict["source"] = "yuyi"    # 标识来源是语义yuyi端还是backstage后端
+                portraitDict["timestamp"] = timestamp
+                portraitDict["daotaiID"] = daotaiID
+                portraitDict["portrait"] = None    # 画像部分留空
+                portraitDict["savefile"] = ""      # 图片保存路径
+                portraitDict["sentences"] = sentences    # 询问问题
+                portraitDict["timestamp"] = timestamp    # 意图
+                portrait_channel.basic_publish(exchange=portrait_EXCHANGE_NAME,
+                                               routing_key=portrait_routingKey,
+                                               body=str(portraitDict))
         else:
             print("咨询类", "-->", sentences)  # 闲聊场景，将原话传给闲聊机器人
             log.logger.info(("咨询类", "-->", sentences))
