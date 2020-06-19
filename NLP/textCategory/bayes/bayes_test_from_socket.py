@@ -17,11 +17,13 @@ from Logger import *
     从文件读取模型并进行分类，打开socket，接收消息
 '''
 
-logfile = 'D:/data/bayes_from_socket.log'
-log = Logger(logfile, level='info')
-
 AnswerDict = []
 intentionList = []
+ask_sentenses_length = 5    # 当未包含关键字，且问话>5个字时，认为需要转接人工了
+
+# 日志
+semantics_logfile = 'D:/data/daotai_semantics.log'
+semantics_log = Logger(semantics_logfile, level='info')
 
 def loadAnswers():
     with open("../kdata/intention_answer.txt", encoding="utf-8", errors="ignore") as fo:
@@ -45,10 +47,10 @@ def get_newest_model(model_path):
     if os.path.exists(model_full_path):
         # 按文件最后修改时间排序，reverse=True表示降序排序
         filelist = sorted(os.listdir(model_full_path), key=lambda x: os.path.getctime(os.path.join(model_full_path, x)), reverse=True)
-        log.logger.info(("Use Model: %s" % (os.path.join(model_full_path, filelist[0]))))
+        semantics_log.logger.info(("Use Model: %s" % (os.path.join(model_full_path, filelist[0]))))
         return os.path.join(model_full_path, filelist[0])
     else:
-        log.logger("Model path is not exists")
+        semantics_log.logger("Model path is not exists")
 
 '''
     读取配置文件，获取打开SocketServer的ip和端口
@@ -90,24 +92,24 @@ def test_bayes(model_file):
     clf = joblib.load(model_file)
     # loadAnswers()    # 加载 意图-答案 表
     backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey = getRabbitConn("rabbit2backstage")
-    log.logger.info("rabbit2backstage producer 已启动：%s %s %s" % (backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey))
+    semantics_log.logger.info("rabbit2backstage producer 已启动：%s %s %s" % (backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey))
     print("rabbit2backstage producer 已启动：%s %s %s" % (backstage_channel, backstage_EXCHANGE_NAME, backstage_routingKey))
 
     portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey = getRabbitConn("rabbit2portrait")
-    log.logger.info("rabbit2portrait producer 已启动：%s %s %s" % (portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey))
+    semantics_log.logger.info("rabbit2portrait producer 已启动：%s %s %s" % (portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey))
     print("rabbit2portrait producer 已启动：%s %s %s" % (portrait_channel, portrait_EXCHANGE_NAME, portrait_routingKey))
 
     sev = socket.socket(socket.AF_INET, socket.SOCK_STREAM)  # TCP连接
     HOST, PORT = getSocketConfig()
     sev.bind((HOST, PORT))    # 192.168.120.133是连安卓时用
     sev.listen()
-    log.logger.info("语义识别端已启动。。。")
+    semantics_log.logger.info("语义识别端已启动。。。")
     print("语义识别端已启动。。。")
 
     conn, addr = sev.accept()
-    log.logger.info("%s %s" % (conn, addr))
+    semantics_log.logger.info("%s %s" % (conn, addr))
     print(conn, addr)
-    log.logger.info((conn, addr))
+    semantics_log.logger.info((conn, addr))
     sentences = ""
     empty_package_nums = 0    # 记录空包的数量
 
@@ -123,47 +125,69 @@ def test_bayes(model_file):
                 empty_package_nums = 0    # 如果遇到非空包来，则空包数量重新计数
 
             recvJson = json.loads(recvStr)
-            log.logger.info(recvJson)
+            semantics_log.logger.info(recvJson)
             daotaiID = recvJson["daotaiID"]
             sentences = recvJson["message"]
             timestamp = recvJson["timestamp"]
         except ConnectionResetError as connectionResetError:
-            log.logger.warn("客户端已断开，正在等待重连: ", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+            semantics_log.logger.warn("客户端已断开，正在等待重连: ", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
             print("客户端已断开，正在等待重连: ", time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
             conn, addr = sev.accept()
-            log.logger.info("%s %s" % (conn, addr))
+            semantics_log.logger.info("%s %s" % (conn, addr))
             print(conn, addr)
-            log.logger.info((conn, addr))
+            semantics_log.logger.info((conn, addr))
         except Exception as e:
-            traceback.print_exc(file=open(logfile, 'a+'))
+            traceback.print_exc(file=open(semantics_logfile, 'a+'))
             continue
 
         word_list = []
-        new_sentences = get_words(sentences)
+        new_sentences, shinei_area = get_words(sentences)
         if isChat(new_sentences) is False:  # 如果不是闲聊
-            word_list.append(new_sentences)
-            predict = clf.predict(word_list)
-            for left in predict:
-                if left == "坐车":
-                    left = "坐高铁"
-                # answer = getAnswer(left)
-                # thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
-                print(left, "-->", word_list, "-->", sentences)
-                log.logger.info((left, "-->", word_list, "-->", sentences))
+            if len(shinei_area) > 0:
+                print("导航", "-->", word_list, "-->", sentences)
+                semantics_log.logger.info(("导航", "-->", word_list, "-->", sentences))
 
                 yuyiDict = {}
                 yuyiDict["daotaiID"] = daotaiID
-                yuyiDict["sentences"] = sentences
+                yuyiDict["sentences"] = sentences + "|" + shinei_area[0]
                 yuyiDict["timestamp"] = timestamp
-                yuyiDict["intention"] = left    # 意图
+                yuyiDict["intention"] = "导航"  # 意图
 
                 # 之后将yuyiDict写入到消息队列
-                # channel.basic_publish(exchange=EXCHANGE_NAME,
-                #                       routing_key=routingKey,
-                #                       body=str(yuyiDict),
-                #                       properties=pika.BasicProperties(    # 如果仅仅是设置了队列的持久化，仅队列本身可以在rabbit-server宕机后保留，队列中的信息依然会丢失，如果想让队列中的信息或者任务保留，还需要这行代码
-                #                           delivery_mode=2,  # 使消息或任务也持久化存储
-                #                       ))
+                backstage_channel.basic_publish(exchange=backstage_EXCHANGE_NAME,
+                                                routing_key=backstage_routingKey,
+                                                body=str(yuyiDict))  # 将语义识别结果给到后端
+
+                # 人物画像端
+                portraitDict = {}  # 人物画像要填的字段
+                portraitDict["source"] = "yuyi"  # 标识来源是语义yuyi端还是backstage后端
+                portraitDict["timestamp"] = timestamp
+                portraitDict["daotaiID"] = daotaiID
+                portraitDict["portrait"] = None  # 画像部分留空
+                portraitDict["savefile"] = ""  # 图片保存路径
+                portraitDict["sentences"] = sentences + "|" + shinei_area[0]  # 询问问题
+                portraitDict["intention"] = "导航"  # 意图
+                portraitDict["intentionLevel"] = "1"  # 意图等级：1级，直接意图；2级，意图的分类；
+                portrait_channel.basic_publish(exchange=portrait_EXCHANGE_NAME,
+                                               routing_key=portrait_routingKey,
+                                               body=str(portraitDict))  # 将语义结果发送到用户画像端
+            else:
+                word_list.append(new_sentences)
+                predict = clf.predict(word_list)
+                for left in predict:
+                    if left == "坐车":
+                        left = "坐高铁"
+                    # answer = getAnswer(left)
+                    # thread.start_new_thread(send_msg, ())    # 新开一个线程，通知前端
+                    print(left, "-->", word_list, "-->", sentences)
+                    semantics_log.logger.info((left, "-->", word_list, "-->", sentences))
+
+                    yuyiDict = {}
+                    yuyiDict["daotaiID"] = daotaiID
+                    yuyiDict["sentences"] = sentences
+                    yuyiDict["timestamp"] = timestamp
+                    yuyiDict["intention"] = left  # 意图
+                # 之后将yuyiDict写入到消息队列
                 backstage_channel.basic_publish(exchange=backstage_EXCHANGE_NAME,
                                                 routing_key=backstage_routingKey,
                                                 body=str(yuyiDict))    # 将语义识别结果给到后端
@@ -176,13 +200,41 @@ def test_bayes(model_file):
                 portraitDict["portrait"] = None    # 画像部分留空
                 portraitDict["savefile"] = ""      # 图片保存路径
                 portraitDict["sentences"] = sentences    # 询问问题
-                portraitDict["timestamp"] = timestamp    # 意图
+                portraitDict["intention"] = left    # 意图
+                portraitDict["intentionLevel"] = "1"    # 意图等级：1级，直接意图；2级，意图的分类；
                 portrait_channel.basic_publish(exchange=portrait_EXCHANGE_NAME,
                                                routing_key=portrait_routingKey,
-                                               body=str(portraitDict))
+                                               body=str(portraitDict))    # 将语义结果发送到用户画像端
         else:
-            print("咨询类", "-->", sentences)  # 闲聊场景，将原话传给闲聊机器人
-            log.logger.info(("咨询类", "-->", sentences))
+            print("咨询类", "-->", sentences)  # 咨询场景，判断标准：说话字数>5字
+            semantics_log.logger.info(("咨询类", "-->", sentences))
+
+            if len(sentences.strip()) > ask_sentenses_length:
+                yuyiDict = {}
+                yuyiDict["daotaiID"] = daotaiID
+                yuyiDict["sentences"] = sentences
+                yuyiDict["timestamp"] = timestamp
+                yuyiDict["intention"] = "artificial"  # 意图
+
+                # 之后将yuyiDict写入到消息队列
+                backstage_channel.basic_publish(exchange=backstage_EXCHANGE_NAME,
+                                                routing_key=backstage_routingKey,
+                                                body=str(yuyiDict))  # 将语义识别结果给到后端
+
+                # 人物画像端
+                portraitDict = {}  # 人物画像要填的字段
+                portraitDict["source"] = "yuyi"  # 标识来源是语义yuyi端还是backstage后端
+                portraitDict["timestamp"] = timestamp
+                portraitDict["daotaiID"] = daotaiID
+                portraitDict["portrait"] = None  # 画像部分留空
+                portraitDict["savefile"] = ""  # 图片保存路径
+                portraitDict["sentences"] = sentences  # 询问问题
+                portraitDict["intention"] = "artificial"  # 意图
+                portraitDict["intentionLevel"] = "1"  # 意图等级：1级，直接意图；2级，意图的分类；
+                portrait_channel.basic_publish(exchange=portrait_EXCHANGE_NAME,
+                                               routing_key=portrait_routingKey,
+                                               body=str(portraitDict))  # 将语义结果发送到用户画像端
+
 
 
 def main():
