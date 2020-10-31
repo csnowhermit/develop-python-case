@@ -7,8 +7,9 @@ import numpy as np
     算法：检测到各个方向上像素强度有很大变化的点，构建矩阵，提取特征值，通过特征值进行评分决定它是否是一个角。
 '''
 
-file = "C:/Users/ASUS/Desktop/广州南站.jpg"
+# file = "G:/workspace/workspace_python/mx_AI/passflow-detect/ml/10.6.8.181_01_20200403174021755.mp4_frame_1610.jpg"
 # file = "D:/logs/before.jpg"
+file = "D:/logs/1.jpg"
 img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 

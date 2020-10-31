@@ -12,6 +12,7 @@ from NLP.textCategory.utils.GenAllStations import genStationList
     基于keywords，依据len(keyword)降序排序，生成atomic.txt
     1.全国地名、车站名确保完整切词；
     2.指定关键词确保完整切词；
+    3.广州市内地名确保完整切词；
 '''
 def genAtoFile():
     mydict = {}
@@ -22,6 +23,11 @@ def genAtoFile():
 
     for key in keywords:        # 处理关键词
         mydict[key] = len(key)
+
+    with open("../kdata/shinei.txt", encoding='utf-8') as fo:
+        for area_name in fo.readlines():
+            area_name = area_name.strip("\n").strip()
+            mydict[area_name] = len(area_name)
 
     # 默认升序排序，加reverse=True，降序排序
     sort_tuple_list = sorted([(value, key) for (key, value) in mydict.items()], reverse=True)

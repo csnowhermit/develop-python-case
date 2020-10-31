@@ -13,7 +13,7 @@ import numpy as np
         else：（介于两者之间），根据其是否与“确认边缘点”之间有无连接来确定，有连接则不丢弃。
 '''
 
-file = "C:/Users/ASUS/Desktop/广州南站.jpg"
+file = "G:/workspace/workspace_python/mx_AI/passflow-detect/ml/10.6.8.181_01_20200403174021755.mp4_frame_1610.jpg"
 # file = "D:/logs/before.jpg"    # 车厢监控下的图像不需要做bluring（不做bluring时边缘检测效果更好）
 img = cv2.imdecode(np.fromfile(file, dtype=np.uint8), cv2.IMREAD_COLOR)
 img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
