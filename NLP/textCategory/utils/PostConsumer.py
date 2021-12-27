@@ -1,14 +1,12 @@
 # -*- coding:utf-8 -*-
 
 import os
-from collections import Counter
-import _thread as thread
 import redis
 import hashlib
 import traceback
 from NLP.Logger import *
 from NLP.textCategory.utils.SubmitActionUtil import submit_msg
-from NLS.speech_recognition.TTS.tts_webapi import tts_key, base_dir, play
+from NLS.tts.tts_webapi import tts_key, base_dir, play
 
 '''
     后消费者：将回答切分，传给前端
