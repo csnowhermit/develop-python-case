@@ -21,5 +21,5 @@ nb-configuration.xml
 *__pycache__*
 NLS/speech_recognition/logs/
 
-cat_dog_reco/data/
 CV/image_processing/*.jpg
+rabbitmq
