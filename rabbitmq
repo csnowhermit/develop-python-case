@@ -1,4 +1,0 @@
-[master 3127993] update: bayes_test_from_socket
- 4 files changed, 141 insertions(+), 21 deletions(-)
- create mode 100644 NLP/textCategory/bayes/producerDemo.py
- create mode 100644 NLP/textCategory/bayes/rabbit_consumer.py
