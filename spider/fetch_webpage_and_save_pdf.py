@@ -43,11 +43,21 @@ if __name__ == '__main__':
     # 设置Chrome的选项
     chrome_options = webdriver.ChromeOptions()
 
-    # 支持无界面的headless模式
+    # # 支持无界面的headless模式
+    # chrome_options.add_argument("--headless")
+    # 
+    # # 为确保打印样式，可设定浏览器宽高
+    # chrome_options.add_argument("--window-size=1920,1080")
+    
+    # Docker中运行应使用如下参数
     chrome_options.add_argument("--headless")
-
-    # 为确保打印样式，可设定浏览器宽高
-    chrome_options.add_argument("--window-size=1920,1080")
+    chrome_options.add_argument("--no-sandbox")
+    chrome_options.add_argument("--disable-dev-shm-usage")
+    chrome_options.add_argument("--disable-gpu")  # 如果在无头模式下，这个参数可以帮助节省资源
+    # 跳过'chrome正受到自动测试软件的控制'的提示
+    chrome_options.add_argument("disable-infobars")
+    # 指定启动时Chrome窗口的大小，对无头模式可能有帮助
+    chrome_options.add_argument("window-size=1920x1080")
 
     # 初始化WebDriver
     driver = webdriver.Chrome(service=service, options=chrome_options)
